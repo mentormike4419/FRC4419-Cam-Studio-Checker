@@ -1,4 +1,5 @@
 // Current CAM Studio Checker backend: Onshape grant and CAM settings report.
+// Changes to this production file sync and publish through GitHub Actions.
 // Credentials stay in ONSHAPE_CLIENT_ID and ONSHAPE_CLIENT_SECRET Script Properties.
 const AUTH_ENDPOINT = "https://oauth.onshape.com/oauth/authorize";
 const TOKEN_ENDPOINT = "https://oauth.onshape.com/oauth/token";
