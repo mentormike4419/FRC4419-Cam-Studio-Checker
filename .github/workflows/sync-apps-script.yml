@@ -50,5 +50,12 @@ jobs:
             echo "The deployment configured in background.js was not found in this Apps Script project." >&2
             exit 1
           fi
-          clasp update-deployment "$DEPLOYMENT_ID" --description "FRC4419 CAM Checker $(git -C "$GITHUB_WORKSPACE" rev-parse --short HEAD)"
-          echo "Updated the existing web app deployment."
+          DEPLOY_OUTPUT="$(clasp update-deployment "$DEPLOYMENT_ID" --description "FRC4419 CAM Checker $(git -C "$GITHUB_WORKSPACE" rev-parse --short HEAD)")"
+          printf '%s\n' "$DEPLOY_OUTPUT"
+          DEPLOYED_VERSION="$(printf '%s\n' "$DEPLOY_OUTPUT" | sed -nE 's/.*@([0-9]+).*/\1/p' | tail -n 1)"
+          REPORT_VERSION="$(node -e 'const fs=require("fs");const text=fs.readFileSync(process.argv[1],"utf8");const match=text.match(/CAM_REPORT_VERSION\s*=\s*"([^"]+)"/);if(!match)process.exit(1);process.stdout.write(match[1]);' "$GITHUB_WORKSPACE/apps-script/CamReport.gs")"
+          if [[ -z "$DEPLOYED_VERSION" || "$REPORT_VERSION" != "1.$DEPLOYED_VERSION" ]]; then
+            echo "Report version $REPORT_VERSION does not match deployed Apps Script version 1.$DEPLOYED_VERSION." >&2
+            exit 1
+          fi
+          echo "Updated the existing web app deployment as $REPORT_VERSION."

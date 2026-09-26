@@ -1,155 +1,14 @@
-const CAM_REPORT_VERSION = "1.22";
+const CAM_REPORT_VERSION = "1.23";
 
 // CAM Studio report formatting for the Google Apps Script web app.
 // Returns text data to the extension; no browser APIs are used.
-function renderCamReport(camData, currentBodyNamesByJob) {
-    /*
-     * =========================================================
-     * BTJ HELPERS
-     * =========================================================
-     */
-
-    function getProperties(object) {
-
-        const data =
-            object?.message?.data;
-
-        return Array.isArray(data)
-            ? data
-            : [];
-    }
-
-
+function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
     function getProperty(object, name) {
-
-        const entry =
-            getProperties(object).find(
-                item => item?.key === name
-            );
-
-        return entry
-            ? entry.value
-            : undefined;
+        return object == null ? undefined : object[name];
     }
-
-
-    function unwrap(value) {
-
-        if (
-            value === null ||
-            value === undefined
-        ) {
-            return value;
-        }
-
-
-        if (
-            value.message &&
-            Object.prototype.hasOwnProperty.call(
-                value.message,
-                "value"
-            )
-        ) {
-            return value.message.value;
-        }
-
-
-        if (
-            value.message &&
-            Array.isArray(value.message.data)
-        ) {
-            return value.message.data;
-        }
-
-
-        return value;
-    }
-
 
     function getSimple(object, name) {
-
-        return unwrap(
-            getProperty(object, name)
-        );
-    }
-
-
-    function btjToJS(value) {
-
-        if (
-            value === null ||
-            value === undefined
-        ) {
-            return value;
-        }
-
-
-        if (
-            value.message &&
-            Object.prototype.hasOwnProperty.call(
-                value.message,
-                "value"
-            )
-        ) {
-            return value.message.value;
-        }
-
-
-        const data =
-            value?.message?.data;
-
-
-        if (Array.isArray(data)) {
-
-            const isObject =
-                data.every(
-                    item =>
-                        item &&
-                        typeof item === "object" &&
-                        Object.prototype.hasOwnProperty.call(
-                            item,
-                            "key"
-                        ) &&
-                        Object.prototype.hasOwnProperty.call(
-                            item,
-                            "value"
-                        )
-                );
-
-
-            if (isObject) {
-
-                const result = {};
-
-
-                for (const item of data) {
-
-                    result[item.key] =
-                        btjToJS(
-                            item.value
-                        );
-                }
-
-
-                return result;
-            }
-
-
-            return data.map(
-                item => btjToJS(item)
-            );
-        }
-
-
-        if (Array.isArray(value)) {
-
-            return value.map(
-                item => btjToJS(item)
-            );
-        }
-
-
-        return value;
+        return getProperty(object, name);
     }
 
 
@@ -434,7 +293,7 @@ function renderCamReport(camData, currentBodyNamesByJob) {
         );
 
         const settings =
-            btjToJS(
+            (
                 getProperty(
                     machine.object,
                     "postSettings"
@@ -563,7 +422,7 @@ function renderCamReport(camData, currentBodyNamesByJob) {
 
 
         const setupData =
-            btjToJS(
+            (
                 setup.object
             ) || {};
 
@@ -636,17 +495,8 @@ function renderCamReport(camData, currentBodyNamesByJob) {
         );
 
 
-        const toolParameters =
-            btjToJS(
-                getProperty(
-                    tool.object,
-                    "toolParameters"
-                )
-            ) || {};
-
-
         const cutter =
-            btjToJS(
+            (
                 getProperty(
                     tool.object,
                     "cutter"
@@ -1160,6 +1010,30 @@ function renderCamReport(camData, currentBodyNamesByJob) {
      * =========================================================
      */
 
+    function reportDepthStep(roughing, lines, heading) {
+        lines.push("");
+        lines.push("    " + heading);
+        addLine(lines, "Depth step enabled", roughing.depthStepFlag, "      ");
+        if (roughing.depthStepFlag !== true) return;
+        addLine(lines, "Depth step mode", roughing.depthStepMode, "      ");
+        addLength(lines, "Depth step", roughing.depthStep, "      ");
+        if (roughing.firstDepthStepFlag === true) {
+            addLength(lines, "First depth step", roughing.firstDepthStep, "      ");
+        }
+        if (roughing.finalDepthStepFlag === true) {
+            addLength(lines, "Final depth step", roughing.finalDepthStep, "      ");
+        }
+    }
+
+    function reportTabs(wireframe, lines) {
+        lines.push("");
+        lines.push("    TABS");
+        addLine(lines, "Tabs", wireframe.tabsFlag, "      ");
+        if (wireframe.tabsFlag !== true) return;
+        addLength(lines, "Tab width", wireframe.tabsWidth, "      ");
+        addLength(lines, "Tab height", wireframe.tabsHeight, "      ");
+    }
+
     function reportTwoAxisProfile(
         wireframe,
         lines
@@ -1187,76 +1061,8 @@ function renderCamReport(camData, currentBodyNamesByJob) {
          * DEPTH STEPPING
          */
 
-        const roughing =
-            wireframe.roughingParameters || {};
-
-
-        lines.push("");
-        lines.push(
-            "    DEPTH CONTROL"
-        );
-
-
-        addLine(
-            lines,
-            "Depth step enabled",
-            roughing.depthStepFlag,
-            "      "
-        );
-
-
-        /*
-         * IMPORTANT:
-         *
-         * First/final/depth step values are only displayed
-         * when depth stepping itself is enabled.
-         */
-
-        if (
-            roughing.depthStepFlag === true
-        ) {
-
-            addLine(
-                lines,
-                "Depth step mode",
-                roughing.depthStepMode,
-                "      "
-            );
-
-
-            addLength(
-                lines,
-                "Depth step",
-                roughing.depthStep,
-                "      "
-            );
-
-
-            if (
-                roughing.firstDepthStepFlag === true
-            ) {
-
-                addLength(
-                    lines,
-                    "First depth step",
-                    roughing.firstDepthStep,
-                    "      "
-                );
-            }
-
-
-            if (
-                roughing.finalDepthStepFlag === true
-            ) {
-
-                addLength(
-                    lines,
-                    "Final depth step",
-                    roughing.finalDepthStep,
-                    "      "
-                );
-            }
-        }
+        const roughing = wireframe.roughingParameters || {};
+        reportDepthStep(roughing, lines, "DEPTH CONTROL");
 
 
         /*
@@ -1332,42 +1138,7 @@ function renderCamReport(camData, currentBodyNamesByJob) {
         }
 
 
-        /*
-         * TABS
-         */
-
-        lines.push("");
-        lines.push(
-            "    TABS"
-        );
-
-
-        addLine(
-            lines,
-            "Tabs",
-            wireframe.tabsFlag,
-            "      "
-        );
-
-
-        if (
-            wireframe.tabsFlag === true
-        ) {
-
-            addLength(
-                lines,
-                "Tab width",
-                wireframe.tabsWidth,
-                "      "
-            );
-
-            addLength(
-                lines,
-                "Tab height",
-                wireframe.tabsHeight,
-                "      "
-            );
-        }
+        reportTabs(wireframe, lines);
     }
 
 
@@ -1412,71 +1183,7 @@ function renderCamReport(camData, currentBodyNamesByJob) {
             wireframe.roughingParameters || {};
 
 
-        lines.push("");
-        lines.push(
-            "    ROUGHING"
-        );
-
-
-        /*
-         * Do not use operation NAME to determine this.
-         * This function is reached only when JSON Pattern
-         * is exactly TwoAxisRough.
-         */
-
-
-        addLine(
-            lines,
-            "Depth step enabled",
-            roughing.depthStepFlag,
-            "      "
-        );
-
-
-        if (
-            roughing.depthStepFlag === true
-        ) {
-
-            addLine(
-                lines,
-                "Depth step mode",
-                roughing.depthStepMode,
-                "      "
-            );
-
-            addLength(
-                lines,
-                "Depth step",
-                roughing.depthStep,
-                "      "
-            );
-
-
-            if (
-                roughing.firstDepthStepFlag === true
-            ) {
-
-                addLength(
-                    lines,
-                    "First depth step",
-                    roughing.firstDepthStep,
-                    "      "
-                );
-            }
-
-
-            if (
-                roughing.finalDepthStepFlag === true
-            ) {
-
-                addLength(
-                    lines,
-                    "Final depth step",
-                    roughing.finalDepthStep,
-                    "      "
-                );
-            }
-        }
+        reportDepthStep(roughing, lines, "ROUGHING");
 
 
         /*
@@ -1525,42 +1232,7 @@ function renderCamReport(camData, currentBodyNamesByJob) {
         }
 
 
-        /*
-         * TABS
-         */
-
-        lines.push("");
-        lines.push(
-            "    TABS"
-        );
-
-
-        addLine(
-            lines,
-            "Tabs",
-            wireframe.tabsFlag,
-            "      "
-        );
-
-
-        if (
-            wireframe.tabsFlag === true
-        ) {
-
-            addLength(
-                lines,
-                "Tab width",
-                wireframe.tabsWidth,
-                "      "
-            );
-
-            addLength(
-                lines,
-                "Tab height",
-                wireframe.tabsHeight,
-                "      "
-            );
-        }
+        reportTabs(wireframe, lines);
     }
 
 
@@ -1678,7 +1350,7 @@ function renderCamReport(camData, currentBodyNamesByJob) {
     ) {
 
         const parameters =
-            btjToJS(
+            (
                 getProperty(
                     toolpath.object,
                     "toolPathParameters"
@@ -1827,15 +1499,13 @@ function renderCamReport(camData, currentBodyNamesByJob) {
 
 
 
-  const rootData = camData?.tree?.message?.data;
-  if (!Array.isArray(rootData)) throw new Error("CAM root data was not found.");
-  const jobsEntry = rootData.find(entry => entry?.key === "jobs");
-  const jobs = jobsEntry?.value?.message?.data;
-  if (!Array.isArray(jobs) || jobs.length === 0) throw new Error("No CAM jobs were found.");
-  const components = btjToJS(getProperty(camData.tree, "components")) || [];
+  const tree = decodedTree || decodeCamTree_(camData?.tree);
+  const jobs = Array.isArray(tree?.jobs) ? tree.jobs : [];
+  if (jobs.length === 0) throw new Error("No CAM jobs were found.");
+  const components = Array.isArray(tree.components) ? tree.components : [];
   return jobs.map((job, jobIndex) => {
     const jobName = getSimple(job, "name") || "(unnamed job)";
-    const selections = btjToJS(getProperty(job, "selectionParameters"))?.bodies?.associativeSelections || [];
+    const selections = job.selectionParameters?.bodies?.associativeSelections || [];
     const bodyNames = selections.map((selection, selectionIndex) => {
       const currentName = currentBodyNamesByJob?.[jobIndex]?.[selectionIndex];
       if (typeof currentName === "string" && currentName.trim()) return currentName;
@@ -1844,8 +1514,8 @@ function renderCamReport(camData, currentBodyNamesByJob) {
       );
       return component?.name || "(unresolved body)";
     });
-    const stockDirectionType = btjToJS(getProperty(job, "stock"))?.directionType;
-    const operations = unwrap(getProperty(job, "operations"));
+    const stockDirectionType = job.stock?.directionType;
+    const operations = job.operations;
     if (!Array.isArray(operations)) throw new Error("Job operations array was not found.");
     return buildReport(jobName, buildHierarchy(operations), bodyNames, stockDirectionType);
   }).join("\n\n");

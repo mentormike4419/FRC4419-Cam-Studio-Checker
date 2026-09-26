@@ -19,11 +19,16 @@ async function showCamSettings() {
   reportVersionElement.textContent = "v—";
   setStatus("Reading the active CAM Studio tab...");
   try {
-    const data = await call("report", await activeCamIds());
+    const data = await call("report", {
+      ...(await activeCamIds()),
+      clientVersion: chrome.runtime.getManifest().version
+    });
     if (!data || data.error) throw new Error(data?.error || "No response from Apps Script.");
     if (typeof data.reportText !== "string") throw new Error("Apps Script did not return a CAM report. Deploy the latest Code.gs and CamReport.gs.");
     const versionMatch = data.reportText.match(/^REPORT VERSION:\s*([^\r\n]+)/m);
-    reportVersionElement.textContent = versionMatch ? "v" + versionMatch[1].trim() : "v?";
+    reportVersionElement.textContent = data.reportVersion
+      ? "v" + data.reportVersion
+      : versionMatch ? "v" + versionMatch[1].trim() : "v?";
     reportElement.textContent = data.reportText.replace(/^REPORT VERSION:[^\r\n]*\r?\n?/m, "");
     setStatus("CAM settings read; " + (data.onshapeRequests || 1) + " Onshape request.");
   } catch (error) { setStatus(error.message); }
