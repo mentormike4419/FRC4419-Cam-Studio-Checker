@@ -1,0 +1,42 @@
+name: Sync Apps Script
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: apps-script-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Sync Code.gs and CamReport.gs to existing project
+        env:
+          CLASPRC_JSON: ${{ secrets.CLASPRC_JSON }}
+          APPS_SCRIPT_ID: ${{ secrets.APPS_SCRIPT_ID }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$CLASPRC_JSON" || -z "$APPS_SCRIPT_ID" ]]; then
+            echo "Set CLASPRC_JSON and APPS_SCRIPT_ID as repository Actions secrets." >&2
+            exit 1
+          fi
+          npm install --global @google/clasp
+          printf '%s' "$CLASPRC_JSON" > "$HOME/.clasprc.json"
+          chmod 600 "$HOME/.clasprc.json"
+          PROJECT_DIR="$RUNNER_TEMP/cam-checker-script"
+          mkdir -p "$PROJECT_DIR"
+          node -e 'require("fs").writeFileSync(process.argv[1], JSON.stringify({scriptId: process.env.APPS_SCRIPT_ID}))' "$PROJECT_DIR/.clasp.json"
+          cd "$PROJECT_DIR"
+          clasp pull
+          cp "$GITHUB_WORKSPACE/apps-script/Code.gs" Code.gs
+          cp "$GITHUB_WORKSPACE/apps-script/CamReport.gs" CamReport.gs
+          clasp push --force
+          echo "Synced Code.gs and CamReport.gs. The published web app deployment was not changed."
