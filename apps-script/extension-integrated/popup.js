@@ -1,0 +1,45 @@
+const statusElement = document.getElementById("status");
+const reportElement = document.getElementById("report");
+
+function setStatus(message) { statusElement.textContent = message; }
+function call(action, extra = {}) {
+  return new Promise(resolve => chrome.runtime.sendMessage({ action, ...extra }, data => {
+    resolve(chrome.runtime.lastError ? { error: chrome.runtime.lastError.message } : data);
+  }));
+}
+async function activeCamIds() {
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  const match = (tab?.url || "").match(/\/documents\/([0-9a-f]{24})\/w\/([0-9a-f]{24})\/e\/([0-9a-f]{24})/i);
+  if (!match) throw new Error("Open a CAM Studio workspace tab in this window first.");
+  return { documentId: match[1], workspaceId: match[2], elementId: match[3] };
+}
+async function showCamSettings() {
+  reportElement.textContent = "";
+  setStatus("Reading the active CAM Studio tab...");
+  try {
+    const data = await call("report", await activeCamIds());
+    if (!data || data.error) throw new Error(data?.error || "No response from Apps Script.");
+    if (!data.cam) throw new Error("Apps Script did not return CAM settings.");
+    reportElement.textContent = renderCamReport(data.cam);
+    setStatus("CAM settings read; " + (data.onshapeRequests || 1) + " Onshape request.");
+  } catch (error) { setStatus(error.message); }
+}
+document.getElementById("connect").onclick = async () => {
+  setStatus("Starting Onshape authorization...");
+  const data = await call("begin");
+  if (data?.authorizationUrl) {
+    chrome.tabs.create({ url: data.authorizationUrl });
+    setStatus("Authorize in the new tab, then return and click Status.");
+  } else setStatus(data?.error || "Could not start authorization.");
+};
+document.getElementById("statusButton").onclick = async () => {
+  const data = await call("status");
+  setStatus(data?.error || (data?.connected ? "Connected to Onshape." : "Not connected."));
+};
+document.getElementById("reportButton").onclick = showCamSettings;
+document.getElementById("disconnect").onclick = async () => {
+  const data = await call("disconnect");
+  reportElement.textContent = "";
+  setStatus(data?.error || "This browser's grant was forgotten.");
+};
+document.getElementById("statusButton").click();
