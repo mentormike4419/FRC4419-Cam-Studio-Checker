@@ -19,6 +19,7 @@ This prototype is a read-only report. It shows job bodies, stock direction, the 
 
 - [Current extension source](apps-script/extension-integrated/) — the version 0.3.4 release candidate; version 0.3.3 is currently under Web Store review.
 - [Extension details](apps-script/extension-integrated/README.md) — scope, units, and installation notes.
+- [Apps Script report formatter](apps-script/CamReport.gs) — controls the text shown in the side panel.
 - [Privacy policy](PRIVACY.md).
 
-The extension communicates with a Google Apps Script web app to authorize Onshape and read CAM settings. The release's web app URL is configured in `background.js`. Source is provided for learning and inspection; installing from the Chrome Web Store is the simplest way to use the team's deployment.
+The extension communicates with a Google Apps Script web app to authorize Onshape, read CAM settings, and format the side panel report. `Code.gs` retains the original JSON response for version 0.3.3 while also returning report text for the next extension version. The release's web app URL is configured in `background.js`. Source is provided for learning and inspection; installing from the Chrome Web Store is the simplest way to use the team's deployment.
