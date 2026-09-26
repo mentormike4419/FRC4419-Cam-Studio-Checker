@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "FRC4419 CAM Studio Checker",
+  "version": "0.3.3",
+  "description": "Read and display Onshape CAM Studio settings through Apps Script.",
+  "permissions": [
+    "tabs",
+    "storage",
+    "sidePanel"
+  ],
+  "host_permissions": [
+    "https://script.google.com/*",
+    "https://script.googleusercontent.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Open FRC4419 CAM Studio Checker",
+    "default_icon": {
+      "128": "FRC4419_CAM_Studio_Checker_128.png"
+    }
+  },
+  "side_panel": {
+    "default_path": "popup.html"
+  },
+  "icons": {
+    "128": "FRC4419_CAM_Studio_Checker_128.png"
+  }
+}
