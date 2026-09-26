@@ -15,6 +15,11 @@ This prototype is a read-only report. It shows job bodies, stock direction, the 
 
 **Forget grant** removes this browser's saved authorization on the Apps Script backend. You can reconnect later.
 
+
+## Maintaining the Apps Script connection
+
+To sync the complete Apps Script files from GitHub, save the project's Script ID as the `APPS_SCRIPT_ID` repository Actions secret and complete the one-time `CLASPRC_JSON` secret setup in the [sync guide](apps-script/SYNCING.md). Enable the Google Apps Script API, then run **Actions → Sync Apps Script** in this repository. When this GitHub sync is no longer used, turn the Apps Script API off in your Google account settings.
+
 ## Source and documentation
 
 - [Current extension source](apps-script/extension-integrated/) — the version 0.3.4 release candidate; version 0.3.3 is currently under Web Store review.
