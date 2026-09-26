@@ -1,6 +1,6 @@
 # Sync GitHub files into the existing Apps Script project
 
-The production repository has a manual GitHub Action named **Sync Apps Script**. It copies the complete `apps-script/Code.gs` and `apps-script/CamReport.gs` files into the existing Google Apps Script project. Before copying them, it downloads that project's current files so other files and `appsscript.json` stay in place. It does not change the published web app deployment or its URL.
+The production repository has a manual GitHub Action named **Sync Apps Script**. It copies the complete `apps-script/Code.gs` and `apps-script/CamReport.gs` files into the existing Google Apps Script project. Before copying them, it downloads that project's current files so other files and `appsscript.json` stay in place. After syncing, it creates a new version of the existing web app deployment while keeping its URL. The deployment ID comes from the extension's configured web app URL and is checked against the connected Apps Script project.
 
 ## One-time setup
 
@@ -14,8 +14,6 @@ Use the Google account that owns or can edit the existing Apps Script project.
 
 ## Each update
 
-In the production repo, open **Actions → Sync Apps Script → Run workflow**. A green run means the editor's current project code was updated. Check that both `Code.gs` and `CamReport.gs` appear in the editor.
-
-To make the already published `/exec` URL serve the new code, create a **new version of the existing deployment** in the Apps Script editor (**Deploy → Manage deployments → Edit → Version: New version → Deploy**). The GitHub Action intentionally leaves that deployment step manual while the report migration is being tested.
+In the production repo, open **Actions → Sync Apps Script → Run workflow**. A green run means the project files were updated and a new version was published to the existing `/exec` URL. Check that both `Code.gs` and `CamReport.gs` appear in the editor, then test the extension's report against an open CAM Studio.
 
 The two GitHub source files are the authoritative versions for future report edits. Do not paste patches into the Apps Script editor after setting up the sync.
