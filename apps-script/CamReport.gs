@@ -1,6 +1,6 @@
 // CAM Studio report formatting for the Google Apps Script web app.
 // Returns text data to the extension; no browser APIs are used.
-function renderCamReport(camData) {
+function renderCamReport(camData, currentBodyNamesByJob) {
     /*
      * =========================================================
      * BTJ HELPERS
@@ -1778,10 +1778,12 @@ function renderCamReport(camData) {
   const jobs = jobsEntry?.value?.message?.data;
   if (!Array.isArray(jobs) || jobs.length === 0) throw new Error("No CAM jobs were found.");
   const components = btjToJS(getProperty(camData.tree, "components")) || [];
-  return jobs.map(job => {
+  return jobs.map((job, jobIndex) => {
     const jobName = getSimple(job, "name") || "(unnamed job)";
     const selections = btjToJS(getProperty(job, "selectionParameters"))?.bodies?.associativeSelections || [];
-    const bodyNames = selections.map(selection => {
+    const bodyNames = selections.map((selection, selectionIndex) => {
+      const currentName = currentBodyNamesByJob?.[jobIndex]?.[selectionIndex];
+      if (typeof currentName === "string" && currentName.trim()) return currentName;
       const component = components.find(item =>
         item._nodeId === selection.componentId || item.referenceId === selection.componentRef
       );

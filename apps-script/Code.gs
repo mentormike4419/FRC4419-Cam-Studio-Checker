@@ -92,8 +92,10 @@ function doPost(e) {
       }
       if (!isJson_(text)) throw new Error("CAM data is not valid JSON.");
       const cam = JSON.parse(text);
+      const bodies = currentJobBodyNames_(cam, ids, grant.accessToken);
       // Retain cam for extensions already submitted to the Web Store.
-      return json_({ cam: cam, reportText: renderCamReport(cam), onshapeRequests: 1 });
+      return json_({ cam: cam, reportText: renderCamReport(cam, bodies.namesByJob),
+        onshapeRequests: 1 + bodies.requests });
     }
     return json_({
       connected: true, userId: grant.userId, email: grant.email,
@@ -293,4 +295,69 @@ function decodeCamTree_(value) {
   }
   if (Array.isArray(value)) return value.map(decodeCamTree_);
   return value;
+}
+
+// Resolve the selected CAM body through its Onshape reference to the current part name.
+function currentJobBodyNames_(cam, ids, accessToken) {
+  const tree = decodeCamTree_(cam.tree);
+  const jobs = tree && Array.isArray(tree.jobs) ? tree.jobs : [];
+  const components = tree && Array.isArray(tree.components) ? tree.components : [];
+  const headers = { Authorization: "Bearer " + accessToken, Accept: "application/json" };
+  const cache = {};
+  let requests = 0;
+
+  function fetchJson(url) {
+    requests++;
+    const response = UrlFetchApp.fetch(url, { headers: headers, muteHttpExceptions: true });
+    if (response.getResponseCode() !== 200) return null;
+    return JSON.parse(response.getContentText());
+  }
+
+  const namesByJob = jobs.map(function (job) {
+    const bodies = job.selectionParameters && job.selectionParameters.bodies;
+    const selections = bodies && bodies.associativeSelections;
+    if (!Array.isArray(selections)) return [];
+    return selections.map(function (selection) {
+      const component = components.find(function (item) {
+        return item._nodeId === selection.componentId;
+      }) || components.find(function (item) {
+        return item.referenceId === selection.componentRef;
+      });
+      const fallback = component && component.name;
+      const refId = selection.componentRef || (component && component.referenceId);
+      if (typeof refId !== "string" || !/^[0-9a-f]{24}$/i.test(refId)) return fallback;
+      const cacheKey = refId + ":" + (selection.associativityIdBodyId || "");
+      if (Object.prototype.hasOwnProperty.call(cache, cacheKey)) return cache[cacheKey];
+      let name = fallback;
+      try {
+        const ref = fetchJson(API_ENDPOINT + "/appelements/d/" + ids.documentId +
+          "/w/" + ids.workspaceId + "/e/" + ids.elementId + "/references/" + refId);
+        if (ref && ref.targetElementId && /^[0-9a-f]{24}$/i.test(ref.targetElementId)) {
+          const did = ref.targetDocumentId || ids.documentId;
+          const revision = ref.targetVersionId ? "v/" + ref.targetVersionId : "w/" + ids.workspaceId;
+          if (/^[0-9a-f]{24}$/i.test(did)) {
+            const parts = fetchJson(API_ENDPOINT + "/parts/d/" + did + "/" + revision +
+              "/e/" + ref.targetElementId);
+            if (Array.isArray(parts)) {
+              const identities = [ref.partIdentity, selection.associativityIdBodyId]
+                .filter(function (id) { return typeof id === "string" && id.length > 0; });
+              const matched = parts.find(function (part) {
+                return identities.some(function (id) {
+                  return part.partIdentity === id || part.partId === id || part.id === id;
+                });
+              }) || (parts.length === 1 ? parts[0] : null);
+              if (matched && typeof matched.name === "string" && matched.name.trim()) {
+                name = matched.name;
+              }
+            }
+          }
+        }
+      } catch (_) {
+        // Keep the CAM component name when a reference cannot be resolved.
+      }
+      cache[cacheKey] = name;
+      return name;
+    });
+  });
+  return { namesByJob: namesByJob, requests: requests };
 }
