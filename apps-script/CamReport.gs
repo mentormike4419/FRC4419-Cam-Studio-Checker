@@ -460,6 +460,69 @@ function renderCamReport(camData, currentBodyNamesByJob) {
      * =========================================================
      */
 
+    function findWorkPlaneSettings(value, depth = 0) {
+
+        if (
+            !value ||
+            typeof value !== "object" ||
+            Array.isArray(value) ||
+            depth > 6
+        ) {
+            return null;
+        }
+
+
+        const keys =
+            Object.keys(value);
+
+        const originKey =
+            keys.find(
+                key => key.toLowerCase() === "origin"
+            );
+
+        const orientationKey =
+            keys.find(
+                key => key.toLowerCase() === "orientation"
+            );
+
+
+        if (
+            originKey &&
+            orientationKey
+        ) {
+            return {
+                origin: value[originKey],
+                orientation: value[orientationKey]
+            };
+        }
+
+
+        const orderedKeys =
+            keys.sort(
+                (a, b) =>
+                    Number(/work.?plane/i.test(b)) -
+                    Number(/work.?plane/i.test(a))
+            );
+
+
+        for (const key of orderedKeys) {
+
+            const result =
+                findWorkPlaneSettings(
+                    value[key],
+                    depth + 1
+                );
+
+            if (result) {
+                return result;
+            }
+        }
+
+
+        return null;
+    }
+
+
     function reportSetup(
         setup,
         lines
@@ -468,10 +531,6 @@ function renderCamReport(camData, currentBodyNamesByJob) {
         lines.push("");
         lines.push(
             `SETUP: ${setup.name}`
-        );
-
-        lines.push(
-            "=============================="
         );
 
 
@@ -484,55 +543,42 @@ function renderCamReport(camData, currentBodyNamesByJob) {
             ) || {};
 
 
+        const workPlane =
+            findWorkPlaneSettings(
+                setupParameters
+            ) || {};
+
+
+        const origin =
+            workPlane.origin ??
+            setupParameters.workPlaneOrigin ??
+            "(not found)";
+
+        const orientation =
+            workPlane.orientation ??
+            setupParameters.workPlaneOrientation ??
+            "(not found)";
+
+
         lines.push(
-            "  SETUP PARAMETERS"
+            "  WORK PLANE"
         );
 
 
         addLine(
             lines,
-            "Mating type",
-            setupParameters.matingType,
+            "Origin",
+            origin,
             "    "
         );
 
 
-        if (setupParameters.matingOffset) {
-
-            addLength(
-                lines,
-                "Mating offset X",
-                setupParameters.matingOffset.x,
-                "    "
-            );
-
-            addLength(
-                lines,
-                "Mating offset Y",
-                setupParameters.matingOffset.y,
-                "    "
-            );
-
-            addLength(
-                lines,
-                "Mating offset Z",
-                setupParameters.matingOffset.z,
-                "    "
-            );
-        }
-
-
-        if (setupParameters.postSettings) {
-
-            addLine(
-                lines,
-                "Program number",
-                setupParameters
-                    .postSettings
-                    .programNumber,
-                "    "
-            );
-        }
+        addLine(
+            lines,
+            "Orientation",
+            orientation,
+            "    "
+        );
     }
 
 
