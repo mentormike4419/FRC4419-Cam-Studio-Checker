@@ -1732,16 +1732,6 @@ function renderCamReport(camData, currentBodyNamesByJob) {
 
 
         lines.push(
-            "CAM ACTIVE SETTINGS"
-        );
-
-        lines.push(
-            "==================="
-        );
-
-        lines.push("");
-
-        lines.push(
             `JOB: ${jobName}`
         );
         lines.push(
