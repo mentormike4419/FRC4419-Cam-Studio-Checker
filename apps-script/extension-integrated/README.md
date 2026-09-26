@@ -6,11 +6,12 @@ The report displays jobs, machine Output unit, setups, tools, and operations. Le
 
 ## Use
 
-1. Open an Onshape CAM Studio workspace tab.
-2. Click the extension icon to open the side panel.
-3. Click **Connect** and authorize Onshape in the new tab. Close the authorization tab after it says the connection succeeded.
-4. Click **Status**, then **Show CAM settings**. No URL needs to be pasted.
-5. Click **Forget grant** to remove this browser's stored connection from the backend.
+1. [Install FRC4419 CAM Studio Checker from the Chrome Web Store](https://chromewebstore.google.com/detail/oegpilpfacppnakopiiahhalepflpglc) once the listing is approved and live.
+2. Open an Onshape CAM Studio workspace tab.
+3. Click the extension icon to open the side panel.
+4. Click **Connect** and authorize Onshape in the new tab. Close the authorization tab after it says the connection succeeded.
+5. Click **Status**, then **Show CAM settings**. No URL needs to be pasted.
+6. Click **Forget grant** to remove this browser's stored connection from the backend.
 
 ## Run from source
 
