@@ -475,15 +475,41 @@ function renderCamReport(camData, currentBodyNamesByJob) {
         const keys =
             Object.keys(value);
 
+        function findKey(aliases) {
+
+            return aliases
+                .map(
+                    alias =>
+                        keys.find(
+                            key =>
+                                key
+                                    .toLowerCase()
+                                    .replace(/[^a-z]/g, "") === alias
+                        )
+                )
+                .find(Boolean);
+        }
+
+
         const originKey =
-            keys.find(
-                key => key.toLowerCase() === "origin"
-            );
+            findKey([
+                "origin",
+                "origintype",
+                "workplaneorigin",
+                "workplaneorigintype"
+            ]);
 
         const orientationKey =
-            keys.find(
-                key => key.toLowerCase() === "orientation"
-            );
+            findKey([
+                "orientation",
+                "orientationtype",
+                "direction",
+                "directiontype",
+                "workplaneorientation",
+                "workplaneorientationtype",
+                "workplanedirection",
+                "workplanedirectiontype"
+            ]);
 
 
         if (
