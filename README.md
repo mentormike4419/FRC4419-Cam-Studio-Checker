@@ -18,7 +18,7 @@ This prototype is a read-only report. It shows job bodies, stock direction, the 
 
 ## Maintaining the Apps Script connection
 
-To sync the complete Apps Script files from GitHub, save the project's Script ID as the `APPS_SCRIPT_ID` repository Actions secret and complete the one-time `CLASPRC_JSON` secret setup in the [sync guide](apps-script/SYNCING.md). Enable the Google Apps Script API, then run **Actions → Sync Apps Script** in this repository. When this GitHub sync is no longer used, turn the Apps Script API off in your Google account settings.
+To sync the complete Apps Script files from GitHub, save the project's Script ID as the `APPS_SCRIPT_ID` repository Actions secret and complete the one-time `CLASPRC_JSON` secret setup in the [sync guide](apps-script/SYNCING.md). Enable the Google Apps Script API, then run **Actions → Sync Apps Script** in this repository. A successful run also publishes a new version to the existing web app URL. When this GitHub sync is no longer used, turn the Apps Script API off in your Google account settings.
 
 ## Source and documentation
 
