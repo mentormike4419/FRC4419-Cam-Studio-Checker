@@ -36,7 +36,7 @@ jobs:
           node -e 'require("fs").writeFileSync(process.argv[1], JSON.stringify({scriptId: process.env.APPS_SCRIPT_ID}))' "$PROJECT_DIR/.clasp.json"
           cd "$PROJECT_DIR"
           clasp pull
-          cp "$GITHUB_WORKSPACE/apps-script/Code.gs" Code.gs
-          cp "$GITHUB_WORKSPACE/apps-script/CamReport.gs" CamReport.gs
+          cp "$GITHUB_WORKSPACE/apps-script/Code.gs" Code.js
+          cp "$GITHUB_WORKSPACE/apps-script/CamReport.gs" CamReport.js
           clasp push --force
           echo "Synced Code.gs and CamReport.gs. The published web app deployment was not changed."
