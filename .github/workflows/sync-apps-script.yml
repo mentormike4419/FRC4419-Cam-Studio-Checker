@@ -39,4 +39,11 @@ jobs:
           cp "$GITHUB_WORKSPACE/apps-script/Code.gs" Code.js
           cp "$GITHUB_WORKSPACE/apps-script/CamReport.gs" CamReport.js
           clasp push --force
-          echo "Synced Code.gs and CamReport.gs. The published web app deployment was not changed."
+          echo "Synced Code.gs and CamReport.gs."
+          DEPLOYMENT_ID="$(node -e 'const fs = require("fs"); const src = fs.readFileSync(process.argv[1], "utf8"); const match = src.match(/https:\\/\\/script\\.google\\.com\\/macros\\/s\\/([^/"]+)\\/exec/); if (!match) process.exit(1); process.stdout.write(match[1]);' "$GITHUB_WORKSPACE/apps-script/extension-integrated/background.js")"
+          if ! clasp list-deployments | grep -Fq -- "$DEPLOYMENT_ID"; then
+            echo "The deployment configured in background.js was not found in this Apps Script project." >&2
+            exit 1
+          fi
+          clasp update-deployment "$DEPLOYMENT_ID" --description "FRC4419 CAM Checker $(git -C "$GITHUB_WORKSPACE" rev-parse --short HEAD)"
+          echo "Updated the existing web app deployment."
