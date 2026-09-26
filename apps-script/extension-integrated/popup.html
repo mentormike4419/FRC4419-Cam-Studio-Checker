@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FRC4419 CAM Studio Checker</title>
+<style>
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{display:flex;flex-direction:column;min-width:260px;padding:12px;color:#182332;font:13px Arial,sans-serif}
+header{flex:none}
+h2{margin:0 0 4px;font-size:16px}
+.topline{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.topline a{flex:none;color:#146d42;font-size:12px;white-space:nowrap;padding-top:2px}
+p{margin:0 0 10px;color:#526074;line-height:1.35}
+button{cursor:pointer;font:inherit}
+#reportButton{width:100%;padding:9px;margin:0 0 6px;font-weight:bold}
+.controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+.controls button{min-width:0;padding:7px 2px;font-size:12px}
+#status{margin:9px 0;line-height:1.35}
+#report{flex:1;min-height:0;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;margin:0;border-top:1px solid #bbc8d3;padding:10px 0 16px;font:12px/1.45 Consolas,monospace}
+</style>
+</head>
+<body>
+<header>
+  <div class="topline"><h2>FRC4419 CAM Studio Checker</h2><a href="https://github.com/mentormike4419/FRC4419-Cam-Studio-Checker/blob/main/apps-script/extension-integrated/README.md" target="_blank" rel="noopener noreferrer">How to use ↗</a></div>
+  <p>Active CAM Studio · Inch (MM)</p>
+  <button id="reportButton">Show CAM settings</button>
+  <div class="controls">
+    <button id="connect">Connect</button>
+    <button id="statusButton">Status</button>
+    <button id="disconnect" title="Remove this browser’s saved connection; reconnect any time">Forget grant</button>
+  </div>
+  <div id="status" role="status">Checking connection...</div>
+</header>
+<pre id="report"></pre>
+<script src="cam-report.js"></script>
+<script src="popup.js"></script>
+</body>
+</html>
