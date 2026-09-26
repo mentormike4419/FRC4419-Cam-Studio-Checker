@@ -1,3 +1,5 @@
+const CAM_REPORT_VERSION = "1.0.0";
+
 // CAM Studio report formatting for the Google Apps Script web app.
 // Returns text data to the extension; no browser APIs are used.
 function renderCamReport(camData, currentBodyNamesByJob) {
@@ -493,22 +495,22 @@ function renderCamReport(camData, currentBodyNamesByJob) {
 
         const originKey =
             findKey([
-                "origin",
                 "origintype",
-                "workplaneorigin",
-                "workplaneorigintype"
+                "workplaneorigintype",
+                "origin",
+                "workplaneorigin"
             ]);
 
         const orientationKey =
             findKey([
-                "orientation",
-                "orientationtype",
-                "direction",
                 "directiontype",
-                "workplaneorientation",
+                "workplanedirectiontype",
+                "orientationtype",
                 "workplaneorientationtype",
+                "direction",
                 "workplanedirection",
-                "workplanedirectiontype"
+                "orientation",
+                "workplaneorientation"
             ]);
 
 
@@ -560,16 +562,19 @@ function renderCamReport(camData, currentBodyNamesByJob) {
         );
 
 
-        const setupParameters =
+        const setupData =
             btjToJS(
-                getProperty(
-                    setup.object,
-                    "setupParameters"
-                )
+                setup.object
             ) || {};
+
+        const setupParameters =
+            setupData.setupParameters || {};
 
 
         const workPlane =
+            findWorkPlaneSettings(
+                setupData
+            ) ||
             findWorkPlaneSettings(
                 setupParameters
             ) || {};
@@ -578,11 +583,13 @@ function renderCamReport(camData, currentBodyNamesByJob) {
         const origin =
             workPlane.origin ??
             setupParameters.workPlaneOrigin ??
+            setupParameters.workPlaneOriginType ??
             "(not found)";
 
         const orientation =
             workPlane.orientation ??
             setupParameters.workPlaneOrientation ??
+            setupParameters.workPlaneDirectionType ??
             "(not found)";
 
 
@@ -1760,6 +1767,7 @@ function renderCamReport(camData, currentBodyNamesByJob) {
         lines.push(
             `JOB: ${jobName}`
         );
+        lines.push(`REPORT VERSION: ${CAM_REPORT_VERSION}`);
         lines.push(
             `  Bodies: ${bodyNames.length ? bodyNames.join(", ") : "(none selected)"}`
         );
