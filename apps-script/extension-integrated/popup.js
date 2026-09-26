@@ -19,8 +19,8 @@ async function showCamSettings() {
   try {
     const data = await call("report", await activeCamIds());
     if (!data || data.error) throw new Error(data?.error || "No response from Apps Script.");
-    if (!data.cam) throw new Error("Apps Script did not return CAM settings.");
-    reportElement.textContent = renderCamReport(data.cam);
+    if (typeof data.reportText !== "string") throw new Error("Apps Script did not return a CAM report. Deploy the latest Code.gs and CamReport.gs.");
+    reportElement.textContent = data.reportText;
     setStatus("CAM settings read; " + (data.onshapeRequests || 1) + " Onshape request.");
   } catch (error) { setStatus(error.message); }
 }
