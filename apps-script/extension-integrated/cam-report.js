@@ -431,11 +431,6 @@ function renderCamReport(camData) {
             `MACHINE: ${machine.name}`
         );
 
-        lines.push(
-            "------------------------------"
-        );
-
-
         const settings =
             btjToJS(
                 getProperty(
@@ -480,15 +475,6 @@ function renderCamReport(camData) {
         );
 
 
-        const workPlane =
-            btjToJS(
-                getProperty(
-                    setup.object,
-                    "workPlaneParameters"
-                )
-            ) || {};
-
-
         const setupParameters =
             btjToJS(
                 getProperty(
@@ -498,53 +484,6 @@ function renderCamReport(camData) {
             ) || {};
 
 
-        lines.push("");
-        lines.push(
-            "  WORK PLANE"
-        );
-
-
-        addLine(
-            lines,
-            "Origin type",
-            workPlane.originType,
-            "    "
-        );
-
-        addLine(
-            lines,
-            "Direction type",
-            workPlane.directionType,
-            "    "
-        );
-
-
-        if (workPlane.origin) {
-
-            addLength(
-                lines,
-                "Origin X",
-                workPlane.origin.x,
-                "    "
-            );
-
-            addLength(
-                lines,
-                "Origin Y",
-                workPlane.origin.y,
-                "    "
-            );
-
-            addLength(
-                lines,
-                "Origin Z",
-                workPlane.origin.z,
-                "    "
-            );
-        }
-
-
-        lines.push("");
         lines.push(
             "  SETUP PARAMETERS"
         );
@@ -1752,7 +1691,9 @@ function renderCamReport(camData) {
 
     function buildReport(
         jobName,
-        hierarchy
+        hierarchy,
+        bodyNames,
+        stockDirectionType
     ) {
 
         const lines = [];
@@ -1772,6 +1713,10 @@ function renderCamReport(camData) {
         lines.push(
             `JOB: ${jobName}`
         );
+        lines.push(
+            `  Bodies: ${bodyNames.length ? bodyNames.join(", ") : "(none selected)"}`
+        );
+        addLine(lines, "Stock Direction Type", stockDirectionType, "  ");
 
 
         for (
@@ -1832,10 +1777,19 @@ function renderCamReport(camData) {
   const jobsEntry = rootData.find(entry => entry?.key === "jobs");
   const jobs = jobsEntry?.value?.message?.data;
   if (!Array.isArray(jobs) || jobs.length === 0) throw new Error("No CAM jobs were found.");
+  const components = btjToJS(getProperty(camData.tree, "components")) || [];
   return jobs.map(job => {
     const jobName = getSimple(job, "name") || "(unnamed job)";
+    const selections = btjToJS(getProperty(job, "selectionParameters"))?.bodies?.associativeSelections || [];
+    const bodyNames = selections.map(selection => {
+      const component = components.find(item =>
+        item._nodeId === selection.componentId || item.referenceId === selection.componentRef
+      );
+      return component?.name || "(unresolved body)";
+    });
+    const stockDirectionType = btjToJS(getProperty(job, "stock"))?.directionType;
     const operations = unwrap(getProperty(job, "operations"));
     if (!Array.isArray(operations)) throw new Error("Job operations array was not found.");
-    return buildReport(jobName, buildHierarchy(operations));
+    return buildReport(jobName, buildHierarchy(operations), bodyNames, stockDirectionType);
   }).join("\n\n");
 }
