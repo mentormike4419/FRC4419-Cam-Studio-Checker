@@ -90,7 +90,9 @@ function doPost(e) {
         throw new Error("CAM read returned HTTP " + response.getResponseCode() + ".");
       }
       if (!isJson_(text)) throw new Error("CAM data is not valid JSON.");
-      return json_({ cam: JSON.parse(text), onshapeRequests: 1 });
+      const cam = JSON.parse(text);
+      // Retain cam for extensions already submitted to the Web Store.
+      return json_({ cam: cam, reportText: renderCamReport(cam), onshapeRequests: 1 });
     }
     return json_({
       connected: true, userId: grant.userId, email: grant.email,
