@@ -1,8 +1,8 @@
-# Integrated Chrome extension (v0.3.3)
+# Integrated Chrome extension (v0.3.4 candidate)
 
-This is the source used for the FRC4419 CAM Studio Checker Chrome Web Store package. It opens a side panel beside the active Onshape CAM Studio, reads its document, workspace, and element IDs from the tab URL, and asks the [Apps Script backend](../Code.gs) for a read-only CAM settings report.
+This is the next release candidate; the version 0.3.3 Chrome Web Store package was submitted earlier. It opens a side panel beside the active Onshape CAM Studio, reads its document, workspace, and element IDs from the tab URL, and asks the [Apps Script backend](../Code.gs) for a read-only CAM settings report.
 
-The report displays jobs, machine Output unit, setups, tools, and operations. Lengths use **Inch (MM)** and feeds use **Inch/min (MM/min)**. The Machine section checks Output unit only: Metric is marked as ready, Imperial is flagged to fix, and missing values are marked for review. It does not change CAM settings, inspect generated G-code, infer material, or apply spreadsheet rules.
+The report displays selected body names and Stock Direction Type under each Job, the machine Output unit directly below its name, plus setups, tools, and operations. Setup Work Plane fields are omitted. Lengths use **Inch (MM)** and feeds use **Inch/min (MM/min)**. The Machine section checks Output unit only: Metric is marked as ready, Imperial is flagged to fix, and missing values are marked for review. It does not change CAM settings, inspect generated G-code, infer material, or apply spreadsheet rules.
 
 ## Use
 
