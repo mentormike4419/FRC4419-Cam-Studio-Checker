@@ -14,6 +14,6 @@ Use the Google account that owns or can edit the existing Apps Script project.
 
 ## Each update
 
-In the production repo, open **Actions → Sync Apps Script → Run workflow**. A green run means the project files were updated and a new version was published to the existing `/exec` URL. Check that both `Code.gs` and `CamReport.gs` appear in the editor, then test the extension's report against an open CAM Studio.
+Changes to `apps-script/Code.gs` or `apps-script/CamReport.gs` on production `main` automatically start **Actions → Sync Apps Script**. You can also select **Run workflow** from that Actions page to publish the current GitHub source without changing a file. A green run means the project files were updated and a new version was published to the existing `/exec` URL. Check that both `Code.gs` and `CamReport.gs` appear in the editor, then test the extension's report against an open CAM Studio.
 
 The two GitHub source files are the authoritative versions for future report edits. Do not paste patches into the Apps Script editor after setting up the sync.
