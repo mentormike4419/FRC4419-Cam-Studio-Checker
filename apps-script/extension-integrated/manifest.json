@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "FRC4419 CAM Studio Checker",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "Read and display Onshape CAM Studio settings through Apps Script.",
   "permissions": [
     "tabs",
