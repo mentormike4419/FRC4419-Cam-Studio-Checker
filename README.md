@@ -6,7 +6,7 @@ This prototype is a read-only report. It shows jobs, the machine output unit, se
 
 ## How to use
 
-1. Install FRC4419 CAM Studio Checker from the Chrome Web Store once the listing is available.
+1. [Install FRC4419 CAM Studio Checker from the Chrome Web Store](https://chromewebstore.google.com/detail/oegpilpfacppnakopiiahhalepflpglc) once the listing is approved and live.
 2. Open an Onshape CAM Studio workspace tab for a document you can access.
 3. Click the extension icon to open the side panel.
 4. Click **Connect**, authorize your Onshape account in the new tab, and close that tab when it says the connection succeeded.
