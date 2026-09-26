@@ -1,6 +1,6 @@
 # Integrated Chrome extension (v0.3.4 candidate)
 
-This is the next release candidate; the version 0.3.3 Chrome Web Store package was submitted earlier. It opens a side panel beside the active Onshape CAM Studio, reads its document, workspace, and element IDs from the tab URL, and asks the [Apps Script backend](../Code.gs) for a read-only CAM settings report.
+This is the next release candidate; the version 0.3.3 Chrome Web Store package was submitted earlier. It opens a side panel beside the active Onshape CAM Studio, reads its document, workspace, and element IDs from the tab URL, and asks the [Apps Script backend](../Code.gs) for a read-only CAM settings report. The output text is built in [CamReport.gs](../CamReport.gs); the extension displays it without formatting CAM fields locally.
 
 The report displays selected body names and Stock Direction Type under each Job, the machine Output unit directly below its name, plus setups, tools, and operations. Setup Work Plane fields are omitted. Lengths use **Inch (MM)** and feeds use **Inch/min (MM/min)**. The Machine section checks Output unit only: Metric is marked as ready, Imperial is flagged to fix, and missing values are marked for review. It does not change CAM settings, inspect generated G-code, infer material, or apply spreadsheet rules.
 
@@ -15,9 +15,9 @@ The report displays selected body names and Stock Direction Type under each Job,
 
 ## Run from source
 
-1. Save all six files in this directory together. The `manifest.json` must be at its root.
+1. Save all five extension files in this directory together. The `manifest.json` must be at its root.
 2. In Chrome, open `chrome://extensions`, turn on Developer mode, click **Load unpacked**, and select this directory.
-3. The packaged `background.js` points to the team's Google Apps Script web app. To use your own backend, deploy [Code.gs](../Code.gs) as a web app, set the `ONSHAPE_CLIENT_ID` and `ONSHAPE_CLIENT_SECRET` Script Properties, configure your Onshape OAuth redirect URI, and change `BACKEND_URL` in `background.js` to your own `/exec` URL.
-4. After changing the Apps Script backend, deploy a new version of the existing web app. After changing extension source, reload the unpacked extension.
+3. The packaged `background.js` points to the team's Google Apps Script web app. To use your own backend, paste both [Code.gs](../Code.gs) and [CamReport.gs](../CamReport.gs) into the same Apps Script project and deploy it as a web app, set the `ONSHAPE_CLIENT_ID` and `ONSHAPE_CLIENT_SECRET` Script Properties, configure your Onshape OAuth redirect URI, and change `BACKEND_URL` in `background.js` to your own `/exec` URL.
+4. After changing report formatting in CamReport.gs or the Apps Script backend, create a new version of the existing web app deployment. The current version 0.3.3 extension still receives the original CAM JSON; deploy the backend first, then install the updated extension. After changing extension source, reload the unpacked extension.
 
 The extension source contains no Onshape client secret. Its OAuth grant is maintained by the deployed Apps Script backend.
