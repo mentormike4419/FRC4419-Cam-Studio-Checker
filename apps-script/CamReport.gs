@@ -623,13 +623,6 @@ function renderCamReport(camData, currentBodyNamesByJob) {
 
         addLine(
             lines,
-            "Tool number",
-            toolParameters.number,
-            "    "
-        );
-
-        addLine(
-            lines,
             "Cutter type",
             cutter.cutterType,
             "    "
@@ -660,13 +653,6 @@ function renderCamReport(camData, currentBodyNamesByJob) {
             lines,
             "Overall length",
             cutter.overallLength,
-            "    "
-        );
-
-        addLine(
-            lines,
-            "Tool hand",
-            cutter.toolHand,
             "    "
         );
 
@@ -1753,7 +1739,6 @@ function renderCamReport(camData, currentBodyNamesByJob) {
             "==================="
         );
 
-        lines.push("Length: Inch (MM)  |  Feed: Inch/min (MM/min)");
         lines.push("");
 
         lines.push(
