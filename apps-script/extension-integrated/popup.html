@@ -11,11 +11,8 @@ body{display:flex;flex-direction:column;min-width:260px;padding:12px;color:#1823
 header{flex:none}
 h2{margin:0 0 4px;font-size:16px}
 .topline{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
-.topline a{flex:none;color:#146d42;font-size:12px;white-space:nowrap;padding-top:2px}
-p{margin:0 0 10px;color:#526074;line-height:1.35}
-.subline{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
-.subline p{margin:0}
-#reportVersion{flex:none;color:#526074;font-size:10px;line-height:1.35;white-space:nowrap}
+.topline a{flex:none;display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border:1px solid #146d42;border-radius:50%;color:#146d42;font-size:12px;line-height:1;text-decoration:none;white-space:nowrap}
+#reportVersion{color:#526074;font-size:10px;line-height:1.35;white-space:nowrap}
 button{cursor:pointer;font:inherit}
 #reportButton{width:100%;padding:9px;margin:0 0 6px;font-weight:bold}
 .controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
@@ -26,8 +23,8 @@ button{cursor:pointer;font:inherit}
 </head>
 <body>
 <header>
-  <div class="topline"><h2>FRC4419 CAM Studio Checker</h2><a href="https://github.com/mentormike4419/FRC4419-Cam-Studio-Checker/blob/main/apps-script/extension-integrated/README.md" target="_blank" rel="noopener noreferrer">How to use ↗</a></div>
-  <div class="subline"><p>Active CAM Studio · Inch (MM)</p><span id="reportVersion" title="Apps Script report version" aria-label="Report version">v—</span></div>
+  <div class="topline"><h2>FRC4419 CAM Studio Checker <span id="reportVersion" title="Apps Script report version" aria-label="Report version">v—</span></h2><a href="https://github.com/mentormike4419/FRC4419-Cam-Studio-Checker/blob/main/apps-script/extension-integrated/README.md" target="_blank" rel="noopener noreferrer" aria-label="How to use" title="How to use">?</a></div>
+  
   <button id="reportButton">Show CAM settings</button>
   <div class="controls">
     <button id="connect">Connect</button>
