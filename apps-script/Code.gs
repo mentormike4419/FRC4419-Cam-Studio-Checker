@@ -94,9 +94,9 @@ function doPost(e) {
       try { cam = JSON.parse(text); }
       catch (_) { throw new Error("CAM data is not valid JSON."); }
       const tree = decodeCamTree_(cam.tree);
-      const bodies = currentJobBodyNames_(cam, ids, grant.accessToken, tree);
+      const bodyNamesByJob = currentJobBodyNames_(cam, ids, grant.accessToken, tree);
       return json_({
-        reportText: renderCamReport(cam, bodies.namesByJob, tree),
+        reportText: renderCamReport(cam, bodyNamesByJob, tree),
         reportVersion: CAM_REPORT_VERSION
       });
     }
@@ -320,11 +320,8 @@ function currentJobBodyNames_(cam, ids, accessToken, decodedTree) {
   const headers = { Authorization: "Bearer " + accessToken, Accept: "application/json" };
   const nameCache = Object.create(null);
   const jsonCache = Object.create(null);
-  let requests = 0;
-
   function fetchJson(url) {
     if (Object.prototype.hasOwnProperty.call(jsonCache, url)) return jsonCache[url];
-    requests++;
     let result = null;
     try {
       const response = UrlFetchApp.fetch(url, { headers: headers, muteHttpExceptions: true });
@@ -377,5 +374,5 @@ function currentJobBodyNames_(cam, ids, accessToken, decodedTree) {
       return name;
     });
   });
-  return { namesByJob: namesByJob, requests: requests };
+  return namesByJob;
 }

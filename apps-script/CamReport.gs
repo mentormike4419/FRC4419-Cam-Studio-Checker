@@ -1,4 +1,4 @@
-const CAM_REPORT_VERSION = "1.52";
+const CAM_REPORT_VERSION = "1.53";
 
 // CAM Studio report formatting for the Google Apps Script web app.
 // Returns text data to the extension; no browser APIs are used.
@@ -6,11 +6,6 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
     function getProperty(object, name) {
         return object == null ? undefined : object[name];
     }
-
-    function getSimple(object, name) {
-        return getProperty(object, name);
-    }
-
 
     /*
      * =========================================================
@@ -198,14 +193,14 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
         for (const operation of operations) {
 
             const type =
-                getSimple(
+                getProperty(
                     operation,
                     "operationType"
                 );
 
 
             const name =
-                getSimple(
+                getProperty(
                     operation,
                     "name"
                 ) || "(unnamed)";
@@ -806,18 +801,7 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
         }
 
 
-        if (
-            compensation.wearAmount !== undefined &&
-            Number(compensation.wearAmount) !== 0
-        ) {
 
-            addLength(
-                lines,
-                "Wear amount",
-                compensation.wearAmount,
-                "      "
-            );
-        }
     }
 
 
@@ -1224,15 +1208,32 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
   const jobs = Array.isArray(tree?.jobs) ? tree.jobs : [];
   if (jobs.length === 0) throw new Error("No CAM jobs were found.");
   const components = Array.isArray(tree.components) ? tree.components : [];
+  const componentIndexByNodeId = new Map();
+  const componentIndexByReferenceId = new Map();
+  components.forEach((component, index) => {
+    if (!component) return;
+    if (!componentIndexByNodeId.has(component._nodeId)) {
+      componentIndexByNodeId.set(component._nodeId, index);
+    }
+    if (!componentIndexByReferenceId.has(component.referenceId)) {
+      componentIndexByReferenceId.set(component.referenceId, index);
+    }
+  });
   return jobs.map((job, jobIndex) => {
-    const jobName = getSimple(job, "name") || "(unnamed job)";
+    const jobName = getProperty(job, "name") || "(unnamed job)";
     const selections = job.selectionParameters?.bodies?.associativeSelections || [];
     const bodyNames = selections.map((selection, selectionIndex) => {
       const currentName = currentBodyNamesByJob?.[jobIndex]?.[selectionIndex];
       if (typeof currentName === "string" && currentName.trim()) return currentName;
-      const component = components.find(item =>
-        item._nodeId === selection.componentId || item.referenceId === selection.componentRef
-      );
+      const nodeIndex = componentIndexByNodeId.get(selection.componentId);
+      const referenceIndex = componentIndexByReferenceId.get(selection.componentRef);
+      const hasNodeMatch = componentIndexByNodeId.has(selection.componentId);
+      const hasReferenceMatch = componentIndexByReferenceId.has(selection.componentRef);
+      let componentIndex;
+      if (!hasNodeMatch) componentIndex = hasReferenceMatch ? referenceIndex : undefined;
+      else if (!hasReferenceMatch) componentIndex = nodeIndex;
+      else componentIndex = Math.min(nodeIndex, referenceIndex);
+      const component = componentIndex === undefined ? undefined : components[componentIndex];
       return component?.name || "(unresolved body)";
     });
     const stockDirectionType = job.stock?.directionType;
