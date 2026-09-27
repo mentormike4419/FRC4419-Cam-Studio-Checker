@@ -1,4 +1,4 @@
-const CAM_REPORT_VERSION = "1.31";
+const CAM_REPORT_VERSION = "1.32";
 
 // CAM Studio report formatting for the Google Apps Script web app.
 // Returns text data to the extension; no browser APIs are used.
@@ -507,24 +507,10 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
             "    "
         );
 
-        addLine(
-            lines,
-            "Tool library unit",
-            cutter.unit,
-            "    "
-        );
-
         addLength(
             lines,
             "Diameter",
             cutter.diameter,
-            "    "
-        );
-
-        addLength(
-            lines,
-            "Cutting length",
-            cutter.cuttingLength,
             "    "
         );
     }
