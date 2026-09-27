@@ -73,7 +73,7 @@ function doPost(e) {
       const grant = JSON.parse(stored);
       return json_({ connected: true, userId: grant.userId, email: grant.email });
     }
-    if (action !== "read" && action !== "report") throw new Error("Unknown action.");
+    if (action !== "report") throw new Error("Unknown action.");
     if (!stored) throw new Error("This installation is not connected to Onshape.");
     const ids = ids_(input);
     const grant = JSON.parse(stored);
@@ -99,12 +99,6 @@ function doPost(e) {
         reportVersion: CAM_REPORT_VERSION
       });
     }
-    return json_({
-      connected: true, userId: grant.userId, email: grant.email,
-      camStatus: response.getResponseCode(),
-      json: response.getResponseCode() === 200 && isJson_(text),
-      characters: text.length
-    });
   } catch (error) {
     return json_({ error: String(error.message) });
   }
@@ -162,8 +156,6 @@ function form_(fields) {
     return encodeURIComponent(k) + "=" + encodeURIComponent(fields[k]);
   }).join("&");
 }
-function isJson_(text) { try { JSON.parse(text); return true; } catch (_) { return false; } }
-
 function callbackPage_(title, action, detail, technical) {
   const isError = title === "Connection failed";
   const accent = isError ? "#b63a2b" : "#157e47";
