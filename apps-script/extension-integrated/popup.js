@@ -35,14 +35,18 @@ document.getElementById("connect").onclick = async () => {
     setStatus("Authorize in the new tab, then return and click Status.");
   } else setStatus(data?.error || "Could not start authorization.");
 };
-document.getElementById("statusButton").onclick = async () => {
+async function updateConnectionStatus(promptRun = false) {
   const data = await call("status");
-  setStatus(data?.error || (data?.connected ? "Connected to Onshape." : "Not connected."));
-};
+  if (data?.error) setStatus(data.error);
+  else if (data?.connected) {
+    setStatus(promptRun ? "🟢 Press Run to read CAM settings." : "Connected to Onshape.");
+  } else setStatus("Not connected.");
+}
+document.getElementById("statusButton").onclick = () => updateConnectionStatus(false);
 document.getElementById("reportButton").onclick = showCamSettings;
 document.getElementById("disconnect").onclick = async () => {
   const data = await call("disconnect");
   reportElement.textContent = "";
   setStatus(data?.error || "Connection removed. Click Connect to connect again.");
 };
-document.getElementById("statusButton").click();
+updateConnectionStatus(true);
