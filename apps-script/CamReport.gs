@@ -1,4 +1,4 @@
-const CAM_REPORT_VERSION = "1.44";
+const CAM_REPORT_VERSION = "1.45";
 
 // CAM Studio report formatting for the Google Apps Script web app.
 // Returns text data to the extension; no browser APIs are used.
@@ -832,15 +832,6 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
         addLength(lines, "Last step down", roughing.finalDepthStep, "      ");
     }
 
-    function reportTabs(wireframe, lines) {
-        lines.push("");
-        lines.push("    TABS");
-        addLine(lines, "Tabs", wireframe.tabsFlag, "      ");
-        if (wireframe.tabsFlag !== true) return;
-        addLength(lines, "Tab width", wireframe.tabsWidth, "      ");
-        addLength(lines, "Tab height", wireframe.tabsHeight, "      ");
-    }
-
     function reportTwoAxisProfile(
         wireframe,
         lines
@@ -941,7 +932,7 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
         }
 
 
-        reportTabs(wireframe, lines);
+
     }
 
 
