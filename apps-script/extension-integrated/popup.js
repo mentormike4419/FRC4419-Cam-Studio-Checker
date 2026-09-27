@@ -43,6 +43,6 @@ document.getElementById("reportButton").onclick = showCamSettings;
 document.getElementById("disconnect").onclick = async () => {
   const data = await call("disconnect");
   reportElement.textContent = "";
-  setStatus(data?.error || "This browser's grant was forgotten.");
+  setStatus(data?.error || "Connection removed. Click Connect to connect again.");
 };
 document.getElementById("statusButton").click();
