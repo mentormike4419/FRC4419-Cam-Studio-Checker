@@ -1,4 +1,4 @@
-const CAM_REPORT_VERSION = "1.40";
+const CAM_REPORT_VERSION = "1.41";
 
 // CAM Studio report formatting for the Google Apps Script web app.
 // Returns text data to the extension; no browser APIs are used.
@@ -860,80 +860,7 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
         reportStepDown(roughing, lines);
 
 
-        /*
-         * PROFILE PASS
-         */
 
-        lines.push("");
-        lines.push(
-            "    PROFILE PASS"
-        );
-
-
-        addLine(
-            lines,
-            "Profile pass",
-            wireframe.profilePassFlag,
-            "      "
-        );
-
-
-        if (
-            wireframe.profilePassFlag === true
-        ) {
-
-            addLength(
-                lines,
-                "Profile pass spacing",
-                wireframe.profilePassSpacing,
-                "      "
-            );
-
-
-            const profileComp =
-                wireframe
-                    .profilePassCutterRadiusCompensationParameters
-                    || {};
-
-
-            addLine(
-                lines,
-                "Profile compensation",
-                profileComp.compensationType,
-                "      "
-            );
-
-
-            if (
-                profileComp.compensationRadius !== undefined &&
-                Number(profileComp.compensationRadius) !== 0
-            ) {
-
-                addLength(
-                    lines,
-                    "Profile compensation radius",
-                    profileComp.compensationRadius,
-                    "      "
-                );
-            }
-
-
-            if (
-                profileComp.wearAmount !== undefined &&
-                Number(profileComp.wearAmount) !== 0
-            ) {
-
-                addLength(
-                    lines,
-                    "Profile wear amount",
-                    profileComp.wearAmount,
-                    "      "
-                );
-            }
-        }
-
-
-        reportTabs(wireframe, lines);
     }
 
 
