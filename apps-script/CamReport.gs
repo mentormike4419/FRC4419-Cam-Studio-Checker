@@ -1,4 +1,4 @@
-const CAM_REPORT_VERSION = "1.51";
+const CAM_REPORT_VERSION = "1.52";
 
 // CAM Studio report formatting for the Google Apps Script web app.
 // Returns text data to the extension; no browser APIs are used.
@@ -886,7 +886,22 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
 
         lines.push("");
         lines.push("    STEP OVER");
-        addLine(lines, "Maximum step over type", stepOverParameters.maximumStepOverType, "      ");
+        const stepOverType = stepOverParameters.maximumStepOverType;
+        if (stepOverType !== undefined) {
+            const normalizedStepOverType = String(stepOverType).toLowerCase().replace(/[^a-z0-9]/g, "");
+            const usesToolDiameterPercentage =
+                normalizedStepOverType === "tooldiameterpercentage" ||
+                normalizedStepOverType === "tooldiameterpercent";
+            const displayStepOverType = {
+                toolDiameterPercentage: "Tool diameter %",
+                toolDiameterPercent: "Tool diameter %",
+                cuspHeight: "Cusp height",
+                distance: "Distance"
+            }[stepOverType] || displayValue(stepOverType);
+            lines.push(
+                `      ${usesToolDiameterPercentage ? "✓" : "✕"} Maximum step over type: ${displayStepOverType}`
+            );
+        }
         addLength(lines, "Maximum step over", machining.maximumStepOverDistance, "      ");
 
         reportStepDown(roughing, lines);
