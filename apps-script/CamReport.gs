@@ -1,4 +1,4 @@
-const CAM_REPORT_VERSION = "1.49";
+const CAM_REPORT_VERSION = "1.50";
 
 // CAM Studio report formatting for the Google Apps Script web app.
 // Returns text data to the extension; no browser APIs are used.
@@ -878,13 +878,12 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
             wireframe.roughingParameters || {};
 
 
-        reportStepDown(roughing, lines);
-
-
         lines.push("");
         lines.push("    STEP OVER");
         addLine(lines, "Maximum step over type", stepOverParameters.maximumStepOverType, "      ");
         addLength(lines, "Maximum step over", machining.maximumStepOverDistance, "      ");
+
+        reportStepDown(roughing, lines);
 
 
         /*
