@@ -1,4 +1,4 @@
-const CAM_REPORT_VERSION = "1.54";
+const CAM_REPORT_VERSION = "1.55";
 
 // CAM Studio report formatting for the Google Apps Script web app.
 // Returns text data to the extension; no browser APIs are used.
@@ -149,6 +149,24 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
 
         lines.push(
             `${indent}${label}: ${formatLength(value)}`
+        );
+    }
+
+
+    function addPercent(
+        lines,
+        label,
+        value,
+        indent = "  "
+    ) {
+
+        if (value === undefined) {
+            return;
+        }
+
+
+        lines.push(
+            `${indent}${label}: ${displayValue(value)}%`
         );
     }
 
@@ -906,11 +924,12 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
         lines.push("");
         lines.push("    STEP OVER");
         const stepOverType = stepOverParameters.maximumStepOverType;
+        const normalizedStepOverType = String(stepOverType || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+        const usesToolDiameterPercentage =
+            normalizedStepOverType === "tooldiameterpercentage" ||
+            normalizedStepOverType === "tooldiameterpercent";
+
         if (stepOverType !== undefined) {
-            const normalizedStepOverType = String(stepOverType).toLowerCase().replace(/[^a-z0-9]/g, "");
-            const usesToolDiameterPercentage =
-                normalizedStepOverType === "tooldiameterpercentage" ||
-                normalizedStepOverType === "tooldiameterpercent";
             const displayStepOverType = {
                 toolDiameterPercentage: "Tool diameter %",
                 toolDiameterPercent: "Tool diameter %",
@@ -921,7 +940,12 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
                 `      ${usesToolDiameterPercentage ? "✓" : "✕"} Maximum step over type: ${displayStepOverType}`
             );
         }
-        addLength(lines, "Maximum step over", machining.maximumStepOverDistance, "      ");
+
+        if (usesToolDiameterPercentage) {
+            addPercent(lines, "Maximum step over", machining.maximumStepOverDistance, "      ");
+        } else {
+            addLength(lines, "Maximum step over", machining.maximumStepOverDistance, "      ");
+        }
 
         reportStepDown(roughing, lines);
 
