@@ -1,4 +1,4 @@
-const CAM_REPORT_VERSION = "1.50";
+const CAM_REPORT_VERSION = "1.51";
 
 // CAM Studio report formatting for the Google Apps Script web app.
 // Returns text data to the extension; no browser APIs are used.
@@ -774,9 +774,15 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
         );
 
 
+        const offsetIsNonZero =
+            compensation.compensationRadius !== undefined &&
+            Number(compensation.compensationRadius) !== 0;
+
         addLength(
             lines,
-            "Cutter Compensation Offset",
+            offsetIsNonZero
+                ? "▲ Cutter Compensation Offset"
+                : "Cutter Compensation Offset",
             compensation.compensationRadius,
             "      "
         );
