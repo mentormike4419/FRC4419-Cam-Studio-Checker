@@ -1,4 +1,4 @@
-const CAM_REPORT_VERSION = "1.29";
+const CAM_REPORT_VERSION = "1.30";
 
 // CAM Studio report formatting for the Google Apps Script web app.
 // Returns text data to the extension; no browser APIs are used.
@@ -543,7 +543,7 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
      * =========================================================
      */
 
-    function reportCommonToolPath(
+    function reportFeedSpeed(
         parameters,
         lines
     ) {
@@ -556,12 +556,6 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
 
         const post =
             custom.postParameters || {};
-
-        const heights =
-            custom.heightsParameters || {};
-
-        const link =
-            custom.linkParameters || {};
 
 
         lines.push("");
@@ -620,6 +614,14 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
         );
 
 
+
+    }
+
+    function reportHeights(parameters, lines) {
+        const custom = parameters.customParameters || {};
+        const heights = custom.heightsParameters || {};
+        const link = custom.linkParameters || {};
+
         lines.push("");
         lines.push(
             "    HEIGHTS"
@@ -668,6 +670,11 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
             link.clearanceHeight,
             "      "
         );
+    }
+
+    function reportCommonToolPath(parameters, lines) {
+        reportFeedSpeed(parameters, lines);
+        reportHeights(parameters, lines);
     }
 
 
@@ -723,7 +730,7 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
         );
 
 
-        reportCommonToolPath(
+        reportFeedSpeed(
             parameters,
             lines
         );
@@ -790,6 +797,8 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
                 );
             }
         }
+
+        reportHeights(parameters, lines);
     }
 
 
