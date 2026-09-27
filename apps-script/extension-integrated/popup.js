@@ -11,7 +11,7 @@ function call(action, extra = {}) {
 async function activeCamIds() {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   const match = (tab?.url || "").match(/\/documents\/([0-9a-f]{24})\/w\/([0-9a-f]{24})\/e\/([0-9a-f]{24})/i);
-  if (!match) throw new Error("Open a CAM Studio workspace tab in this window first.");
+  if (!match) throw new Error("→ Open an Onshape CAM Studio tab, then click Show CAM settings.");
   return { documentId: match[1], workspaceId: match[2], elementId: match[3] };
 }
 async function showCamSettings() {
@@ -30,7 +30,7 @@ async function showCamSettings() {
       ? "v" + data.reportVersion
       : versionMatch ? "v" + versionMatch[1].trim() : "v?";
     reportElement.textContent = data.reportText.replace(/^REPORT VERSION:[^\r\n]*\r?\n?/m, "");
-    setStatus("CAM settings read; " + (data.onshapeRequests || 1) + " Onshape request.");
+    setStatus("CAM report ready. Review the settings below.");
   } catch (error) { setStatus(error.message); }
 }
 document.getElementById("connect").onclick = async () => {
