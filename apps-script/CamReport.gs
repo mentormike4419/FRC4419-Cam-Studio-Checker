@@ -1,8 +1,8 @@
-const CAM_REPORT_VERSION = "1.56";
+const CAM_REPORT_VERSION = "1.57";
 
 // CAM Studio report formatting for the Google Apps Script web app.
 // Returns text data to the extension; no browser APIs are used.
-function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
+function renderCamReport(camData, currentBodyNamesByJob, decodedTree, bodyNamesResolvedByJob) {
     function getProperty(object, name) {
         return object == null ? undefined : object[name];
     }
@@ -1293,7 +1293,6 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
     const selections = job.selectionParameters?.bodies?.associativeSelections || [];
     const bodyNames = selections.map((selection, selectionIndex) => {
       const currentName = currentBodyNamesByJob?.[jobIndex]?.[selectionIndex];
-      if (typeof currentName === "string" && currentName.trim()) return currentName;
       const nodeIndex = componentIndexByNodeId.get(selection.componentId);
       const referenceIndex = componentIndexByReferenceId.get(selection.componentRef);
       const hasNodeMatch = componentIndexByNodeId.has(selection.componentId);
@@ -1303,7 +1302,16 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
       else if (!hasReferenceMatch) componentIndex = nodeIndex;
       else componentIndex = Math.min(nodeIndex, referenceIndex);
       const component = componentIndex === undefined ? undefined : components[componentIndex];
-      return component?.name || "(unresolved body)";
+      const name = typeof currentName === "string" && currentName.trim()
+        ? currentName
+        : component?.name || "(unresolved body)";
+      const resolvedStatus = bodyNamesResolvedByJob?.[jobIndex];
+      const resolved = Array.isArray(resolvedStatus)
+        ? resolvedStatus[selectionIndex] === true
+        : true;
+      return !resolved && name !== "(unresolved body)"
+        ? `${name} (CAM fallback)`
+        : name;
     });
     const stockDirectionType = job.stock?.directionType;
     const operations = job.operations;
