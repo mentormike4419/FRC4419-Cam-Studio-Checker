@@ -1,4 +1,4 @@
-const CAM_REPORT_VERSION = "1.48";
+const CAM_REPORT_VERSION = "1.49";
 
 // CAM Studio report formatting for the Google Apps Script web app.
 // Returns text data to the extension; no browser APIs are used.
@@ -984,7 +984,7 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
                 (isOneWay ? "" : " → Set to OneWay")
             );
         } else if (pattern === "TwoAxisRough") {
-            lines.push(`    Pattern ${pattern.toUpperCase()}`);
+            lines.push(`    Pattern: ${pattern.toUpperCase()}`);
             addLine(lines, "Sub Pattern", wireframe.roughType, "    ");
             addLine(lines, "Cutting Method", millPattern, "    ");
         } else {
