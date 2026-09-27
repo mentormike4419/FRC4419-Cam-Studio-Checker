@@ -1,4 +1,4 @@
-const CAM_REPORT_VERSION = "1.26";
+const CAM_REPORT_VERSION = "1.27";
 
 // CAM Studio report formatting for the Google Apps Script web app.
 // Returns text data to the extension; no browser APIs are used.
@@ -569,7 +569,7 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
 
         lines.push("");
         lines.push(
-            "    COMMON MACHINING"
+            "    Feed/Speed"
         );
 
 
@@ -577,27 +577,6 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
             lines,
             "Spindle speed",
             post.spindleSpeed,
-            "      "
-        );
-
-        addLine(
-            lines,
-            "Coolant",
-            post.coolantFlag,
-            "      "
-        );
-
-        addLine(
-            lines,
-            "Air coolant",
-            post.airCoolantFlag,
-            "      "
-        );
-
-        addLine(
-            lines,
-            "Through-tool coolant",
-            post.throughToolCoolantFlag,
             "      "
         );
 
@@ -804,20 +783,6 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
                 "      "
             );
 
-            addLength(
-                lines,
-                "Start/end point distance",
-                drilling.startEndPointDistance,
-                "      "
-            );
-
-            addLine(
-                lines,
-                "Ordering mode",
-                drilling.orderingMode,
-                "      "
-            );
-
             addLine(
                 lines,
                 "Breakthrough",
@@ -837,49 +802,6 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
                     "      "
                 );
             }
-
-
-            addLine(
-                lines,
-                "Peck drilling",
-                drilling.peckDrillFlag,
-                "      "
-            );
-
-
-            if (
-                drilling.peckDrillFlag === true
-            ) {
-
-                addLength(
-                    lines,
-                    "Peck depth",
-                    drilling.peckDepth,
-                    "      "
-                );
-
-                addLine(
-                    lines,
-                    "Full retract",
-                    drilling.fullRetractFlag,
-                    "      "
-                );
-
-                addLength(
-                    lines,
-                    "Minimum retract distance",
-                    drilling.minRetractDistance,
-                    "      "
-                );
-            }
-
-
-            addLine(
-                lines,
-                "Dwell time",
-                drilling.dwellTime,
-                "      "
-            );
         }
     }
 
