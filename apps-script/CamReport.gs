@@ -1,4 +1,4 @@
-const CAM_REPORT_VERSION = "1.39";
+const CAM_REPORT_VERSION = "1.40";
 
 // CAM Studio report formatting for the Google Apps Script web app.
 // Returns text data to the extension; no browser APIs are used.
@@ -539,7 +539,7 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
 
         lines.push("");
         lines.push(
-            "    Feed/Speed"
+            "    FEED/SPEED"
         );
 
 
@@ -821,19 +821,15 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
      * =========================================================
      */
 
-    function reportDepthStep(roughing, lines, heading) {
+    function reportStepDown(roughing, lines) {
         lines.push("");
-        lines.push("    " + heading);
-        addLine(lines, "Depth step enabled", roughing.depthStepFlag, "      ");
-        if (roughing.depthStepFlag !== true) return;
-        addLine(lines, "Depth step mode", roughing.depthStepMode, "      ");
-        addLength(lines, "Depth step", roughing.depthStep, "      ");
-        if (roughing.firstDepthStepFlag === true) {
-            addLength(lines, "First depth step", roughing.firstDepthStep, "      ");
-        }
-        if (roughing.finalDepthStepFlag === true) {
-            addLength(lines, "Final depth step", roughing.finalDepthStep, "      ");
-        }
+        lines.push("    STEP DOWN");
+        addLine(lines, "Step down type", roughing.depthStepMode, "      ");
+        addLength(lines, "Step down", roughing.depthStep, "      ");
+        addLine(lines, "First step down enabled", roughing.firstDepthStepFlag, "      ");
+        addLength(lines, "First step down", roughing.firstDepthStep, "      ");
+        addLine(lines, "Last step down enabled", roughing.finalDepthStepFlag, "      ");
+        addLength(lines, "Last step down", roughing.finalDepthStep, "      ");
     }
 
     function reportTabs(wireframe, lines) {
@@ -861,7 +857,7 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
          */
 
         const roughing = wireframe.roughingParameters || {};
-        reportDepthStep(roughing, lines, "DEPTH CONTROL");
+        reportStepDown(roughing, lines);
 
 
         /*
@@ -975,7 +971,7 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
             wireframe.roughingParameters || {};
 
 
-        reportDepthStep(roughing, lines, "ROUGHING");
+        reportStepDown(roughing, lines);
 
 
         /*
