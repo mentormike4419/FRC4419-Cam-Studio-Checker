@@ -1,4 +1,4 @@
-const CAM_REPORT_VERSION = "1.37";
+const CAM_REPORT_VERSION = "1.38";
 
 // CAM Studio report formatting for the Google Apps Script web app.
 // Returns text data to the extension; no browser APIs are used.
@@ -744,37 +744,6 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
     }
 
 
-    function findMillPattern(value, depth = 0) {
-        if (!value || typeof value !== "object" || Array.isArray(value) || depth > 8) {
-            return undefined;
-        }
-
-        const patternKeys = new Set([
-            "cuttingmethod",
-            "millingmethod",
-            "millpattern",
-            "millingpattern"
-        ]);
-
-        for (const key of Object.keys(value)) {
-            const normalized = key.toLowerCase().replace(/[^a-z]/g, "");
-            if (patternKeys.has(normalized)) {
-                const pattern = value[key];
-                if (typeof pattern === "string" || typeof pattern === "number") {
-                    return pattern;
-                }
-            }
-        }
-
-        for (const key of Object.keys(value)) {
-            const pattern = findMillPattern(value[key], depth + 1);
-            if (pattern !== undefined) return pattern;
-        }
-
-        return undefined;
-    }
-
-
     /*
      * =========================================================
      * CUTTER COMPENSATION
@@ -1088,7 +1057,7 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
             "  ----------------------------"
         );
 
-        const millPattern = findMillPattern(wireframe);
+        const millPattern = machining.machiningType;
         addLine(
             lines,
             "Mill pattern",
