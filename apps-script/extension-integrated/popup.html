@@ -14,8 +14,8 @@ h2{margin:0 0 4px;font-size:16px}
 .topline a{flex:none;display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border:1px solid #146d42;border-radius:50%;color:#146d42;font-size:12px;line-height:1;text-decoration:none;white-space:nowrap}
 #reportVersion{color:#526074;font-size:10px;line-height:1.35;white-space:nowrap}
 button{cursor:pointer;font:inherit}
-#reportButton{width:100%;padding:9px;margin:0 0 6px;font-weight:bold}
-.controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+#reportButton{font-weight:bold}
+.controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
 .controls button{min-width:0;padding:7px 2px;font-size:12px}
 #status{margin:9px 0;line-height:1.35}
 #report{flex:1;min-height:0;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;margin:0;border-top:1px solid #bbc8d3;padding:10px 0 16px;font:12px/1.45 Consolas,monospace}
@@ -25,8 +25,8 @@ button{cursor:pointer;font:inherit}
 <header>
   <div class="topline"><h2>FRC4419 CAM Studio Checker <span id="reportVersion" title="Apps Script report version" aria-label="Report version">v—</span></h2><a href="https://github.com/mentormike4419/FRC4419-Cam-Studio-Checker/blob/main/apps-script/extension-integrated/README.md" target="_blank" rel="noopener noreferrer" aria-label="How to use" title="How to use">?</a></div>
   
-  <button id="reportButton">Show CAM settings</button>
   <div class="controls">
+    <button id="reportButton">Show CAM settings</button>
     <button id="connect">Connect</button>
     <button id="statusButton">Status</button>
     <button id="disconnect" title="Remove this browser’s saved connection; reconnect any time">Forget grant</button>
