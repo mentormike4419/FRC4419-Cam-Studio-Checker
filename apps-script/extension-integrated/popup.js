@@ -30,7 +30,7 @@ async function showCamSettings() {
       ? "v" + data.reportVersion
       : versionMatch ? "v" + versionMatch[1].trim() : "v?";
     reportElement.textContent = data.reportText.replace(/^REPORT VERSION:[^\r\n]*\r?\n?/m, "");
-    setStatus("CAM report ready. Review the settings below.");
+    setStatus("🟡 CAM report ready. Review the settings below.");
   } catch (error) { setStatus(error.message); }
 }
 document.getElementById("connect").onclick = async () => {
