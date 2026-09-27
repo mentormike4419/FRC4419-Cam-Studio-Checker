@@ -1,4 +1,4 @@
-const CAM_REPORT_VERSION = "1.53";
+const CAM_REPORT_VERSION = "1.54";
 
 // CAM Studio report formatting for the Google Apps Script web app.
 // Returns text data to the extension; no browser APIs are used.
@@ -517,9 +517,48 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
      * =========================================================
      */
 
+    function formatSpindleSpeed(value, useGrouping) {
+        if (value === undefined || value === "") return "(not found)";
+        if (value === null) return "null";
+
+        const numeric = Number(value);
+        if (!Number.isFinite(numeric)) return displayValue(value);
+
+        const formatted = cleanNumber(numeric, 3);
+        return useGrouping
+            ? formatted.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+            : formatted;
+    }
+
+
+    function addSpindleSpeed(lines, value, policy) {
+        if (policy === "drill") {
+            const numeric = Number(value);
+            const isWithinRange =
+                Number.isFinite(numeric) && numeric >= 8000 && numeric <= 12000;
+            lines.push(
+                `      ${isWithinRange ? "✓" : "✕"} Spindle speed: ${formatSpindleSpeed(value, false)} (8,000~12,000)`
+            );
+            return;
+        }
+
+        if (policy === "mill") {
+            const numeric = Number(value);
+            const isTargetSpeed = Number.isFinite(numeric) && numeric === 24000;
+            lines.push(
+                `      ${isTargetSpeed ? "✓" : "✕"} Spindle speed: ${formatSpindleSpeed(value, true)} (24,000)`
+            );
+            return;
+        }
+
+        addLine(lines, "Spindle speed", value, "      ");
+    }
+
+
     function reportFeedSpeed(
         parameters,
-        lines
+        lines,
+        spindlePolicy
     ) {
 
         const custom =
@@ -538,12 +577,7 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
         );
 
 
-        addLine(
-            lines,
-            "Spindle speed",
-            post.spindleSpeed,
-            "      "
-        );
+        addSpindleSpeed(lines, post.spindleSpeed, spindlePolicy);
 
         addFeed(
             lines,
@@ -698,7 +732,8 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
 
         reportFeedSpeed(
             parameters,
-            lines
+            lines,
+            strategy === "Drilling" ? "drill" : undefined
         );
 
 
@@ -1002,7 +1037,10 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
 
         reportFeedSpeed(
             parameters,
-            lines
+            lines,
+            pattern === "TwoAxisProfile" || pattern === "TwoAxisRough"
+                ? "mill"
+                : undefined
         );
 
 
