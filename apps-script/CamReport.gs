@@ -1,4 +1,4 @@
-const CAM_REPORT_VERSION = "1.38";
+const CAM_REPORT_VERSION = "1.39";
 
 // CAM Studio report formatting for the Google Apps Script web app.
 // Returns text data to the extension; no browser APIs are used.
@@ -774,20 +774,27 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
         );
 
 
-        /*
-         * Zero compensation radius / wear are not useful
-         * active settings, so only show non-zero values.
-         */
+        addLength(
+            lines,
+            "Cutter Compensation Offset",
+            compensation.compensationRadius,
+            "      "
+        );
 
+
+        /*
+         * Zero wear is not a useful active setting, so only show
+         * non-zero wear values.
+         */
         if (
-            compensation.compensationRadius !== undefined &&
-            Number(compensation.compensationRadius) !== 0
+            compensation.wearAmount !== undefined &&
+            Number(compensation.wearAmount) !== 0
         ) {
 
             addLength(
                 lines,
-                "Compensation radius",
-                compensation.compensationRadius,
+                "Wear amount",
+                compensation.wearAmount,
                 "      "
             );
         }
