@@ -11,7 +11,7 @@ function call(action, extra = {}) {
 async function activeCamIds() {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   const match = (tab?.url || "").match(/\/documents\/([0-9a-f]{24})\/w\/([0-9a-f]{24})\/e\/([0-9a-f]{24})/i);
-  if (!match) throw new Error("→ Open an Onshape CAM Studio tab, then click Show CAM settings.");
+  if (!match) throw new Error("🟡 Open an Onshape CAM Studio tab, then click Show CAM settings.");
   return { documentId: match[1], workspaceId: match[2], elementId: match[3] };
 }
 async function showCamSettings() {
