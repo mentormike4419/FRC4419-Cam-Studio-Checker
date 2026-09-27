@@ -1,4 +1,4 @@
-const CAM_REPORT_VERSION = "1.32";
+const CAM_REPORT_VERSION = "1.33";
 
 // CAM Studio report formatting for the Google Apps Script web app.
 // Returns text data to the extension; no browser APIs are used.
@@ -726,35 +726,6 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
             const drilling =
                 holeMaking
                     .holeMakingDrillingParameters || {};
-
-
-            addLine(
-                lines,
-                "Pattern",
-                drilling.pattern,
-                "      "
-            );
-
-            addLength(
-                lines,
-                "Depth",
-                drilling.depth,
-                "      "
-            );
-
-            addLine(
-                lines,
-                "Surface first contact",
-                drilling.surfaceFirstContactBasedFlag,
-                "      "
-            );
-
-            addLength(
-                lines,
-                "Safe point distance",
-                drilling.safePointDistance,
-                "      "
-            );
 
             addLine(
                 lines,
