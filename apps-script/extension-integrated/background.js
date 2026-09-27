@@ -4,7 +4,7 @@ chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true })
   .catch(error => console.error("Could not configure CAM side panel:", error));
 
 chrome.runtime.onMessage.addListener((message, sender, respond) => {
-  if (!["begin", "status", "check", "report", "disconnect"].includes(message.action)) return;
+  if (!["begin", "status", "report", "disconnect"].includes(message.action)) return;
   sendToBackend(message).then(respond).catch(error => respond({ error: String(error) }));
   return true;
 });
