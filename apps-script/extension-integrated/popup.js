@@ -24,7 +24,7 @@ async function showCamSettings() {
     if (typeof data.reportText !== "string") throw new Error("Apps Script did not return a CAM report. Deploy the latest Code.gs and CamReport.gs.");
     reportVersionElement.textContent = "v" + data.reportVersion;
     reportElement.textContent = data.reportText;
-    setStatus("🟢 CAM report ready. Review the settings below.");
+    setStatus("🟢 CAM report ready.");
   } catch (error) { setStatus(error.message); }
 }
 document.getElementById("connect").onclick = async () => {
