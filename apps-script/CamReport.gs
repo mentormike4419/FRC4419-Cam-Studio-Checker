@@ -1,4 +1,4 @@
-const CAM_REPORT_VERSION = "1.36";
+const CAM_REPORT_VERSION = "1.37";
 
 // CAM Studio report formatting for the Google Apps Script web app.
 // Returns text data to the extension; no browser APIs are used.
@@ -651,10 +651,6 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
         );
     }
 
-    function reportCommonToolPath(parameters, lines) {
-        reportFeedSpeed(parameters, lines);
-        reportHeights(parameters, lines);
-    }
 
 
     /*
@@ -748,51 +744,34 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
     }
 
 
-    /*
-     * =========================================================
-     * WIREFRAME COMMON
-     * =========================================================
-     */
+    function findMillPattern(value, depth = 0) {
+        if (!value || typeof value !== "object" || Array.isArray(value) || depth > 8) {
+            return undefined;
+        }
 
-    function reportWireframeCommon(
-        wireframe,
-        lines
-    ) {
+        const patternKeys = new Set([
+            "cuttingmethod",
+            "millingmethod",
+            "millpattern",
+            "millingpattern"
+        ]);
 
-        addLine(
-            lines,
-            "Cutting mode",
-            wireframe.cuttingMode,
-            "      "
-        );
+        for (const key of Object.keys(value)) {
+            const normalized = key.toLowerCase().replace(/[^a-z]/g, "");
+            if (patternKeys.has(normalized)) {
+                const pattern = value[key];
+                if (typeof pattern === "string" || typeof pattern === "number") {
+                    return pattern;
+                }
+            }
+        }
 
-        addLine(
-            lines,
-            "Cutting side",
-            wireframe.cuttingSide,
-            "      "
-        );
+        for (const key of Object.keys(value)) {
+            const pattern = findMillPattern(value[key], depth + 1);
+            if (pattern !== undefined) return pattern;
+        }
 
-        addLine(
-            lines,
-            "Start position",
-            wireframe.startFromPosition,
-            "      "
-        );
-
-        addLine(
-            lines,
-            "Start corner",
-            wireframe.startCornerMode,
-            "      "
-        );
-
-        addLine(
-            lines,
-            "Reverse cutting order",
-            wireframe.reverseCuttingOrderFlag,
-            "      "
-        );
+        return undefined;
     }
 
 
@@ -894,18 +873,6 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
         wireframe,
         lines
     ) {
-
-        lines.push("");
-        lines.push(
-            "    TWO AXIS PROFILE"
-        );
-
-
-        reportWireframeCommon(
-            wireframe,
-            lines
-        );
-
 
         reportCompensation(
             wireframe,
@@ -1014,13 +981,6 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
             "    TWO AXIS ROUGH"
         );
 
-
-        reportWireframeCommon(
-            wireframe,
-            lines
-        );
-
-
         addLine(
             lines,
             "Rough type",
@@ -1128,15 +1088,15 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
             "  ----------------------------"
         );
 
+        const millPattern = findMillPattern(wireframe);
         addLine(
             lines,
-            "Pattern",
-            pattern,
+            "Mill pattern",
+            millPattern === undefined ? "(not found)" : millPattern,
             "    "
         );
 
-
-        reportCommonToolPath(
+        reportFeedSpeed(
             parameters,
             lines
         );
