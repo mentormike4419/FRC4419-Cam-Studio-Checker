@@ -1,23 +1,27 @@
-# Integrated Chrome extension (v0.3.4 candidate)
+# Chrome extension (production v0.3.19)
 
-This is the next release candidate; the version 0.3.3 Chrome Web Store package was submitted earlier. It opens a side panel beside the active Onshape CAM Studio, reads its document, workspace, and element IDs from the tab URL, and asks the [Apps Script backend](../Code.gs) for a read-only CAM settings report. The output text is built in [CamReport.gs](../CamReport.gs); the extension displays it without formatting CAM fields locally.
+FRC4419 CAM Studio Checker opens a side panel beside an Onshape CAM Studio. It reads the active tab URL and sends the document, workspace, and element IDs to the Apps Script backend. The backend reads the CAM data and builds the report; the extension displays the returned text. The Onshape connection requests read-only access.
 
-The report displays selected body names and Stock Direction Type under each Job, the machine Output unit directly below its name, plus setups, tools, and operations. Setup Work Plane fields are omitted. Lengths use **Inch (MM)** and feeds use **Inch/min (MM/min)**. The Machine section checks Output unit only: Metric is marked as ready, Imperial is flagged to fix, and missing values are marked for review. It does not change CAM settings, inspect generated G-code, infer material, or apply spreadsheet rules.
+The report includes selected Job body names and Stock Direction Type, machine Output unit, setup origin and orientation, tools, and supported operations. It shows lengths as **Inch (MM)** and feeds as **Inch/min (MM/min)**. Built-in indicators call out the Metric output unit, the drill spindle speed range, the 24,000 mill spindle target, OneWay profile cutting, Tool diameter % roughing step-over, and zero cutter compensation offset. The report does not edit CAM settings, inspect generated G-code, infer material, or read spreadsheet rules.
 
 ## Use
 
-1. [Install FRC4419 CAM Studio Checker from the Chrome Web Store](https://chromewebstore.google.com/detail/oegpilpfacppnakopiiahhalepflpglc) once the listing is approved and live.
-2. Open an Onshape CAM Studio workspace tab.
+1. [Install FRC4419 CAM Studio Checker from the Chrome Web Store](https://chromewebstore.google.com/detail/oegpilpfacppnakopiiahhalepflpglc).
+2. Open an Onshape CAM Studio tab for a document you can access.
 3. Click the extension icon to open the side panel.
-4. Click **Connect** and authorize Onshape in the new tab. Close the authorization tab after it says the connection succeeded.
-5. Click **Status**, then **Show CAM settings**. No URL needs to be pasted.
-6. Click **Forget grant** to remove this browser's stored connection from the backend.
+4. Click **Connect** and authorize Onshape in the new tab. Close that tab when it says the connection succeeded.
+5. Return to the side panel. When it says **Press Run**, click **Run** to read the report. Click **Status** to check the connection.
+6. If Machine Output unit shows Imperial, switch it to Metric in Onshape.
+
+Click **Disconnect** to remove this browser's saved checker connection. Click **Connect** to reconnect.
+
+The report version appears beside the extension name in the side panel. It is maintained in [CamReport.gs](../CamReport.gs); the current report version is 1.58.
 
 ## Run from source
 
-1. Save all five extension files in this directory together. The `manifest.json` must be at its root.
+1. Keep the extension files in this directory together, with `manifest.json` at the directory root.
 2. In Chrome, open `chrome://extensions`, turn on Developer mode, click **Load unpacked**, and select this directory.
-3. The packaged `background.js` points to the team's Google Apps Script web app. To use your own backend, paste both [Code.gs](../Code.gs) and [CamReport.gs](../CamReport.gs) into the same Apps Script project and deploy it as a web app, set the `ONSHAPE_CLIENT_ID` and `ONSHAPE_CLIENT_SECRET` Script Properties, configure your Onshape OAuth redirect URI, and change `BACKEND_URL` in `background.js` to your own `/exec` URL.
-4. After changing report formatting in CamReport.gs or the Apps Script backend, create a new version of the existing web app deployment. The current version 0.3.3 extension still receives the original CAM JSON; deploy the backend first, then install the updated extension. After changing extension source, reload the unpacked extension.
+3. The packaged `background.js` points to the team's Google Apps Script web app. To use your own backend, copy `Code.gs`, `CamReport.gs`, and `CallbackIcon.gs` from the parent `apps-script` directory into the same Apps Script project. Deploy the project as a web app, save the Onshape client ID and secret in Script Properties, configure the Onshape OAuth redirect URI to the deployed `/exec` URL, then set `BACKEND_URL` in `background.js` to that URL. Keep the secret in Script Properties rather than in extension source.
+4. For the team's production backend, changes to the Apps Script source on `main` are synced and published by the **Sync Apps Script** GitHub Action. See the [sync guide](../SYNCING.md). Updating Apps Script report code does not require republishing the extension. Changes to extension files require reloading the unpacked extension for local testing and a new Chrome Web Store submission for store users.
 
-The extension source contains no Onshape client secret. Its OAuth grant is maintained by the deployed Apps Script backend.
+The extension source contains no Onshape client secret. Its Onshape authorization and CAM report requests are handled by the Apps Script backend.
