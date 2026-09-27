@@ -106,3 +106,38 @@ test("resolved current body names appear without fallback labels", () => {
   assert.match(text, /Bodies: Panel, Block/);
   assert.doesNotMatch(text, /CAM fallback/);
 });
+
+test("legacy read action is rejected without making an Onshape request", () => {
+  let onshapeRequests = 0;
+  const context = {
+    PropertiesService: {
+      getScriptProperties: () => ({ getProperty: () => null })
+    },
+    Utilities: {
+      DigestAlgorithm: { SHA_256: "SHA_256" },
+      computeDigest: () => [0]
+    },
+    UrlFetchApp: {
+      fetch: () => { onshapeRequests += 1; throw new Error("Unexpected Onshape request"); }
+    },
+    ContentService: {
+      MimeType: { JSON: "application/json" },
+      createTextOutput: text => ({ text, setMimeType() { return this; } })
+    }
+  };
+  vm.createContext(context);
+  vm.runInContext(code + "\n" + report + "\n" + callbackIcon, context);
+
+  const result = context.doPost({
+    postData: { contents: JSON.stringify({ action: "read", connectionKey: "a".repeat(64) }) }
+  });
+
+  assert.deepEqual(JSON.parse(result.text), { error: "Unknown action." });
+  assert.equal(onshapeRequests, 0);
+});
+
+test("extension background no longer forwards the removed check action", () => {
+  const background = fs.readFileSync(path.join(appScriptDir, "extension-integrated", "background.js"), "utf8");
+  assert.match(background, /\["begin", "status", "report", "disconnect"\]/);
+  assert.doesNotMatch(background, /"check"/);
+});
