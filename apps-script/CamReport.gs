@@ -1,4 +1,4 @@
-const CAM_REPORT_VERSION = "1.42";
+const CAM_REPORT_VERSION = "1.43";
 
 // CAM Studio report formatting for the Google Apps Script web app.
 // Returns text data to the extension; no browser APIs are used.
@@ -872,6 +872,7 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
 
     function reportTwoAxisRough(
         wireframe,
+        machining,
         lines
     ) {
 
@@ -882,7 +883,7 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
 
         addLine(
             lines,
-            "Rough type",
+            "Sub-pattern",
             wireframe.roughType,
             "      "
         );
@@ -899,6 +900,12 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
 
 
         reportStepDown(roughing, lines);
+
+
+        lines.push("");
+        lines.push("    STEP OVER");
+        addLine(lines, "Step over type", machining.stepOverType, "      ");
+        addLength(lines, "Step over", machining.desiredStepOver, "      ");
 
 
         /*
@@ -1035,6 +1042,7 @@ function renderCamReport(camData, currentBodyNamesByJob, decodedTree) {
 
             reportTwoAxisRough(
                 wireframe,
+                machining,
                 lines
             );
 
