@@ -1,4 +1,4 @@
-const CAM_REPORT_VERSION = "1.58";
+const CAM_REPORT_VERSION = "1.59";
 
 // CAM Studio report formatting for the Google Apps Script web app.
 // Returns text data to the extension; no browser APIs are used.
