@@ -4,6 +4,19 @@
 const AUTH_ENDPOINT = "https://oauth.onshape.com/oauth/authorize";
 const TOKEN_ENDPOINT = "https://oauth.onshape.com/oauth/token";
 const API_ENDPOINT = "https://cad.onshape.com/api";
+const CAM_TEMPLATE_SOURCES = Object.freeze({
+  aluminum: Object.freeze({
+    documentId: "26b1c442bed276480352793e",
+    workspaceId: "1a221c432d5320b4f0514b98",
+    elementId: "29d7fabeae4a87d8166e9217"
+  }),
+  polycarbonate: Object.freeze({
+    documentId: "c07c1fd01dbf09d37ab1c089",
+    workspaceId: "9499e873f8e3816313869ced",
+    elementId: "72ef93dee09a33b199292c88"
+  })
+});
+
 
 function doGet(e) {
   const p = (e && e.parameter) || {};
@@ -59,7 +72,7 @@ function doPost(e) {
       CacheService.getScriptCache().put("state:" + state, key, 600);
       return json_({ authorizationUrl: AUTH_ENDPOINT + "?" + form_({
         response_type: "code", client_id: config.id, redirect_uri: callbackUrl_(),
-        scope: "OAuth2Read", state: state
+        scope: "OAuth2Read OAuth2Write", state: state
       }) });
     }
     const props = PropertiesService.getScriptProperties();
@@ -73,11 +86,12 @@ function doPost(e) {
       const grant = JSON.parse(stored);
       return json_({ connected: true, userId: grant.userId, email: grant.email });
     }
-    if (action !== "report") throw new Error("Unknown action.");
+    if (action !== "report" && action !== "copyTemplate") throw new Error("Unknown action.");
     if (!stored) throw new Error("This installation is not connected to Onshape.");
-    const ids = ids_(input);
     const grant = JSON.parse(stored);
     if (Date.now() >= grant.expiresAt) refresh_(grant, key);
+    if (action === "copyTemplate") return copyCamTemplate_(input, grant);
+    const ids = ids_(input);
     const url = API_ENDPOINT + "/appelements/d/" + ids.documentId +
       "/w/" + ids.workspaceId + "/e/" + ids.elementId + "/content/json";
     const response = UrlFetchApp.fetch(url, {
@@ -102,6 +116,44 @@ function doPost(e) {
   } catch (error) {
     return json_({ error: String(error.message) });
   }
+}
+
+function copyCamTemplate_(input, grant) {
+  const target = ids_(input);
+  if (!Object.prototype.hasOwnProperty.call(CAM_TEMPLATE_SOURCES, input.material)) {
+    throw new Error("Choose Aluminum or Polycarbonate.");
+  }
+  const source = CAM_TEMPLATE_SOURCES[input.material];
+  if (target.documentId === source.documentId && target.workspaceId === source.workspaceId) {
+    throw new Error("Open the destination document before copying this template.");
+  }
+
+  const url = API_ENDPOINT + "/elements/copyelement/" + target.documentId +
+    "/workspace/" + target.workspaceId;
+  const response = UrlFetchApp.fetch(url, {
+    method: "post",
+    contentType: "application/json",
+    headers: { Authorization: "Bearer " + grant.accessToken, Accept: "application/json" },
+    payload: JSON.stringify({
+      documentIdSource: source.documentId,
+      workspaceIdSource: source.workspaceId,
+      elementIdSource: source.elementId,
+      isGroupAnchor: false
+    }),
+    muteHttpExceptions: true
+  });
+  const status = response.getResponseCode();
+  const body = response.getContentText();
+  if (status < 200 || status >= 300) {
+    throw new Error("Onshape template copy returned HTTP " + status + ".");
+  }
+  let copied = {};
+  try { copied = JSON.parse(body); } catch (_) {}
+  return json_({
+    created: true,
+    material: input.material,
+    elementId: copied.elementId || copied.id || null
+  });
 }
 
 function refresh_(grant, key) {
