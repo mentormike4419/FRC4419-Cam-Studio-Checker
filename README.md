@@ -25,7 +25,7 @@ Changing the Apps Script report does not require a Chrome Web Store update. Chan
 
 - [Published extension source](apps-script/extension-integrated/) — version 0.3.19.
 - [Extension details and usage](apps-script/extension-integrated/README.md).
-- [Apps Script report formatter](apps-script/CamReport.gs) — controls the text shown in the side panel. Current report version: 1.58.
+- [Apps Script report formatter](apps-script/CamReport.gs) — controls the text shown in the side panel. Current report version: 1.60.
 - [Privacy policy](PRIVACY.md).
 
 The extension reads the active CAM Studio URL and sends its document, workspace, and element IDs to the Apps Script backend. The backend authorizes Onshape, reads the CAM data, and builds the report text. The side panel displays that report. Source is provided for learning and inspection; installing from the Chrome Web Store is the simplest way to use the team's deployment.
